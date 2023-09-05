@@ -1,0 +1,16 @@
+{
+	"POST /api/users": {
+		"description": "accepts a user object and adds the user to the database",
+		"exampleRequest": {
+			"fullName": "Michael Panong",
+			"email": "michael.panong@example.com",
+			"password": "M3!qBsx7Sf8Hy6"
+		},
+		"exampleResponse": {
+			"_id": "64f71c09bd22c8de14b39180",
+			"fullName": "Michael Panong",
+			"email": "michael.panong@example.com",
+			"password": "$2b$10$4cw3lzkZiAcO4SrvuVjpQe/p1nH4z/6EtTob1AcWQy9o5n7CWIoRa"
+		}
+	}
+}
