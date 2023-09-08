@@ -1,15 +1,22 @@
-import { describe, test, expect, beforeEach } from 'vitest'
+import { describe, test, expect, beforeEach, afterAll } from 'vitest'
 import request from 'supertest'
 import app from '../src/app'
+import { setup } from '../src/db/setup'
 import { seed } from '../src/db/seed'
 
 beforeEach(() => {
-	return seed()
+	return setup()
+})
+
+afterAll(() => {
+	return setup().then(() => {
+		return seed()
+	})
 })
 
 describe('/api/users', () => {
 	describe('POST request', () => {
-		test('status 201 - accepts user object and responds with added database entry', () => {
+		test('status 201 - accepts user object and responds with added database entry', async () => {
 			interface UserI {
 				fullName: string
 				email: string
@@ -98,12 +105,12 @@ describe('/api/users', () => {
 			const user: UserI = {
 				fullName: 'Saul Goodman',
 				email: 'saul.goodman@example.com',
-				password: 'GHg8F%#KKQuWc3'
+				password: 'imfeym7q9nwj'
 			}
-			return request(app)
-				.post('/api/users')
-				.send(user)
-				.expect(409)
+			return seed()
+				.then(() => {
+					return request(app).post('/api/users').send(user).expect(409)
+				})
 				.then((response) => {
 					const { message } = response.body
 					expect(message).toBe('Account with this email already exists, please log in instead.')

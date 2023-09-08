@@ -1,4 +1,5 @@
 import pool from './connection.js'
+import bcrypt from 'bcrypt'
 
 interface UserI {
 	fullName: string
@@ -8,58 +9,26 @@ interface UserI {
 
 const users: UserI[] = [
 	{
-		fullName: 'Yasmine Quirke',
-		email: 'yasmine.quirke@example.com',
-		password: 'unhashed-6qpcyoMlT0df'
-	},
-	{
-		fullName: 'Adrian Morgan',
-		email: 'adrian.morgan@example.com',
-		password: 'unhashed-wvujwPzhp9Ib'
-	},
-	{
 		fullName: 'Zara Russel',
 		email: 'zara.russel@example.com',
-		password: 'unhashed-fddnQzxuqerp'
+		password: 'fddnQzxuqerp'
 	},
 	{
 		fullName: 'Gabi Ramsay',
 		email: 'gabi.ramsay@example.com',
-		password: 'unhashed-2Vbikjlwe7wo'
+		password: '2Vbikjlwe7wo'
 	},
 	{
 		fullName: 'Saul Goodman',
 		email: 'saul.goodman@example.com',
-		password: 'unhashed-imfeym7q9nwj'
+		password: 'imfeym7q9nwj'
 	}
 ]
 
 export async function seed() {
 	const db = await pool
-	await db.collection('users').drop()
-	await db.createCollection('users', {
-		validator: {
-			$jsonSchema: {
-				bsonType: 'object',
-				title: 'User Object Validation',
-				required: ['fullName', 'email', 'password'],
-				properties: {
-					fullName: {
-						bsonType: 'string',
-						description: "'name' must be a string and is required"
-					},
-					email: {
-						bsonType: 'string',
-						description: "'email' must be a string and is required"
-					},
-					password: {
-						bsonType: 'string',
-						description: "'password' must be a string and is required"
-					}
-				}
-			}
-		}
-	})
-	await db.collection('users').createIndex({ email: 1 }, { unique: true, name: 'email_' })
+	for (let i = 0; i < users.length; i++) {
+		users[i].password = await bcrypt.hash(users[i].password, 10)
+	}
 	await db.collection('users').insertMany(users)
 }
