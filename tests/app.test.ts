@@ -1,10 +1,17 @@
-import { describe, test, expect, beforeEach } from 'vitest'
+import { describe, test, expect, beforeEach, afterAll } from 'vitest'
 import request from 'supertest'
 import app from '../src/app'
+import { setup } from '../src/db/setup'
 import { seed } from '../src/db/seed'
 
 beforeEach(() => {
-	return seed()
+	return setup()
+})
+
+afterAll(() => {
+	return setup().then(() => {
+		return seed()
+	})
 })
 
 describe('/api/users', () => {
@@ -98,15 +105,109 @@ describe('/api/users', () => {
 			const user: UserI = {
 				fullName: 'Saul Goodman',
 				email: 'saul.goodman@example.com',
-				password: 'GHg8F%#KKQuWc3'
+				password: 'imfeym7q9nwj'
 			}
-			return request(app)
-				.post('/api/users')
-				.send(user)
-				.expect(409)
+			return seed()
+				.then(() => {
+					return request(app).post('/api/users').send(user).expect(409)
+				})
 				.then((response) => {
 					const { message } = response.body
 					expect(message).toBe('Account with this email already exists, please log in instead.')
+				})
+		})
+	})
+})
+
+describe('/api/sessions', () => {
+	describe('POST request', () => {
+		test('status 201 - accepts valid login details then creates a new session in database and responds with session cookie', () => {
+			interface LoginI {
+				email: string
+				password: string
+			}
+			const login: LoginI = {
+				email: 'saul.goodman@example.com',
+				password: 'imfeym7q9nwj'
+			}
+			return seed()
+				.then(() => {
+					return request(app).post('/api/sessions').send(login).expect(201)
+				})
+				.then((response) => {
+					expect(response.header).toHaveProperty('set-cookie')
+					const cookie = response.headers['set-cookie'][0]
+					expect(/(?:sessionID)/.test(cookie)).toBe(true)
+				})
+		})
+		test('status 400 - missing email', () => {
+			interface LoginI {
+				email?: string
+				password?: string
+			}
+			const login: LoginI = {
+				password: 'imfeym7q9nwj'
+			}
+			return seed()
+				.then(() => {
+					return request(app).post('/api/sessions').send(login).expect(400)
+				})
+				.then((response) => {
+					const { message } = response.body
+					expect(message).toBe('Missing email or password.')
+				})
+		})
+		test('status 400 - missing password', () => {
+			interface LoginI {
+				email?: string
+				password?: string
+			}
+			const login: LoginI = {
+				email: 'saul.goodman@example.com'
+			}
+			return seed()
+				.then(() => {
+					return request(app).post('/api/sessions').send(login).expect(400)
+				})
+				.then((response) => {
+					const { message } = response.body
+					expect(message).toBe('Missing email or password.')
+				})
+		})
+		test('status 401 - invalid login credentials (email does not exist in database)', () => {
+			interface LoginI {
+				email: string
+				password: string
+			}
+			const login: LoginI = {
+				email: 'michael.panong@example.com',
+				password: 'M3!qBsx7Sf8Hy6'
+			}
+			return seed()
+				.then(() => {
+					return request(app).post('/api/sessions').send(login).expect(401)
+				})
+				.then((response) => {
+					const { message } = response.body
+					expect(message).toBe('Incorrect email or password.')
+				})
+		})
+		test('status 401 - invalid login credentials (wrong password)', () => {
+			interface LoginI {
+				email: string
+				password: string
+			}
+			const login: LoginI = {
+				email: 'saul.goodman@example.com',
+				password: 'wrong-password'
+			}
+			return seed()
+				.then(() => {
+					return request(app).post('/api/sessions').send(login).expect(401)
+				})
+				.then((response) => {
+					const { message } = response.body
+					expect(message).toBe('Incorrect email or password.')
 				})
 		})
 	})

@@ -50,3 +50,28 @@ export function findUserById(userID) {
 			return user
 		})
 }
+
+export function findUserByEmail(email) {
+	return pool
+		.then((db) => {
+			return db.collection('users').findOne({ email: email })
+		})
+		.then((result) => {
+			if (result === null) {
+				return Promise.reject({ code: 404, message: 'Account with email not found.' })
+			}
+			interface UserResponseBody {
+				_id: string
+				fullName: string
+				email: string
+				password: string
+			}
+			const user: UserResponseBody = {
+				_id: result._id.toString(),
+				fullName: result.fullName,
+				email: result.email,
+				password: result.password
+			}
+			return user
+		})
+}
