@@ -199,7 +199,7 @@ describe('/api/sessions', () => {
 			}
 			const login: LoginI = {
 				email: 'saul.goodman@example.com',
-				password: 'qwq12;[1]dOPwidm%'
+				password: 'wrong-password'
 			}
 			return seed()
 				.then(() => {
