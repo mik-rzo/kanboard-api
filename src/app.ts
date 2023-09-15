@@ -16,13 +16,13 @@ const sessionStore = new MongoDBStore({
 	uri:
 		app.get('env') !== 'production'
 			? `mongodb://localhost:27017/${process.env.MONGODB_DATABASE}`
-			: `${process.env.MONGO_URL}`,
+			: process.env.MONGO_URL,
 	collection: 'sessions'
 })
 
 app.use(
 	session({
-		secret: 'thePrestige',
+		secret: process.env.SESSION_SECRET,
 		resave: false,
 		saveUninitialized: false,
 		store: sessionStore,
