@@ -27,7 +27,7 @@ export async function seed() {
 	]
 	const db = await pool
 	for (let i = 0; i < users.length; i++) {
-		users[i].password = await bcrypt.hash(users[i].password, 10)
+		users[i].password = await bcrypt.hash(users[i].password, 5)
 	}
 	await db.collection('users').insertMany(users)
 }
