@@ -3,6 +3,7 @@ import pool from './connection.js'
 export async function setup() {
 	const db = await pool
 	await db.collection('users').drop()
+	await db.collection('sessions').drop()
 	await db.createCollection('users', {
 		validator: {
 			$jsonSchema: {
