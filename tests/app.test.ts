@@ -5,13 +5,13 @@ import { setup } from '../src/db/setup'
 import { seed } from '../src/db/seed'
 
 beforeEach(() => {
-	return setup()
-})
-
-afterAll(() => {
 	return setup().then(() => {
 		return seed()
 	})
+})
+
+afterAll(() => {
+	return setup()
 })
 
 describe('/api/users', () => {
@@ -107,10 +107,10 @@ describe('/api/users', () => {
 				email: 'saul.goodman@example.com',
 				password: 'imfeym7q9nwj'
 			}
-			return seed()
-				.then(() => {
-					return request(app).post('/api/users').send(user).expect(409)
-				})
+			return request(app)
+				.post('/api/users')
+				.send(user)
+				.expect(409)
 				.then((response) => {
 					const { message } = response.body
 					expect(message).toBe('Account with this email already exists, please log in instead.')
@@ -130,10 +130,10 @@ describe('/api/sessions', () => {
 				email: 'saul.goodman@example.com',
 				password: 'imfeym7q9nwj'
 			}
-			return seed()
-				.then(() => {
-					return request(app).post('/api/sessions').send(login).expect(201)
-				})
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.expect(201)
 				.then((response) => {
 					expect(response.header).toHaveProperty('set-cookie')
 					const cookie = response.headers['set-cookie'][0]
@@ -148,10 +148,10 @@ describe('/api/sessions', () => {
 			const login: LoginI = {
 				password: 'imfeym7q9nwj'
 			}
-			return seed()
-				.then(() => {
-					return request(app).post('/api/sessions').send(login).expect(400)
-				})
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.expect(400)
 				.then((response) => {
 					const { message } = response.body
 					expect(message).toBe('Missing email or password.')
@@ -165,10 +165,10 @@ describe('/api/sessions', () => {
 			const login: LoginI = {
 				email: 'saul.goodman@example.com'
 			}
-			return seed()
-				.then(() => {
-					return request(app).post('/api/sessions').send(login).expect(400)
-				})
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.expect(400)
 				.then((response) => {
 					const { message } = response.body
 					expect(message).toBe('Missing email or password.')
@@ -183,10 +183,10 @@ describe('/api/sessions', () => {
 				email: 'michael.panong@example.com',
 				password: 'M3!qBsx7Sf8Hy6'
 			}
-			return seed()
-				.then(() => {
-					return request(app).post('/api/sessions').send(login).expect(401)
-				})
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.expect(401)
 				.then((response) => {
 					const { message } = response.body
 					expect(message).toBe('Incorrect email or password.')
@@ -201,10 +201,10 @@ describe('/api/sessions', () => {
 				email: 'saul.goodman@example.com',
 				password: 'wrong-password'
 			}
-			return seed()
-				.then(() => {
-					return request(app).post('/api/sessions').send(login).expect(401)
-				})
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.expect(401)
 				.then((response) => {
 					const { message } = response.body
 					expect(message).toBe('Incorrect email or password.')
