@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "setup-db": "tsc && node dist/db/run-setup.js",
     "test": "vitest run --reporter verbose",
     "build": "tsc",
     "start": "tsc && node dist/listen.js"
