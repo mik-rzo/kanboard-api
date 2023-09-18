@@ -29,7 +29,7 @@ app.use(
 		name: 'sessionID',
 		cookie: {
 			httpOnly: true,
-			maxAge: 1000 * 30
+			maxAge: 1000 * 60 * 30
 		}
 	})
 )

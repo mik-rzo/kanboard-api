@@ -211,4 +211,45 @@ describe('/api/sessions', () => {
 				})
 		})
 	})
+	describe('DELETE request', () => {
+		test("status 204 - deletes session in database if there's a valid user session", () => {
+			interface LoginI {
+				email: string
+				password: string
+			}
+			const login: LoginI = {
+				email: 'zara.russel@example.com',
+				password: 'fddnQzxuqerp'
+			}
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.then((response) => {
+					const cookie = response.headers['set-cookie']
+					return request(app).delete('/api/sessions').set('Cookie', cookie).expect(204)
+				})
+		})
+		test('status 401 - no user session cookie', () => {
+			return request(app)
+				.delete('/api/sessions')
+				.expect(401)
+				.then((response) => {
+					const { message } = response.body
+					expect(message).toBe('Already logged out.')
+				})
+		})
+		test('status 401 - invalid user session cookie', () => {
+			const cookie = [
+				'sessionID=s%3Af9YDKTyW9u8QfZ-BUE0ShB55xCyTHVWe.f4yLgIRg5vqn5wU1w0nnZYZxsYt98WnTHoQuLVhEfBE; Path=/; Expires=Mon, 18 Sep 2023 14:59:39 GMT; HttpOnly'
+			]
+			return request(app)
+				.delete('/api/sessions')
+				.set('Cookie', cookie)
+				.expect(401)
+				.then((response) => {
+					const { message } = response.body
+					expect(message).toBe('Already logged out.')
+				})
+		})
+	})
 })

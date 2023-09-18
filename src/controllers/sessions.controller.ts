@@ -1,16 +1,27 @@
-import { insertSession } from '../models/sessions.model.js'
+import { insertSession, deleteSessionDoc } from '../models/sessions.model.js'
 
 export function postSession(request, response, next) {
-	insertSession(request.body)
+	insertSession(request.body, request.session)
 		.then(() => {
-      request.session.authenticated = true
 			response.sendStatus(201)
 		})
 		.catch((error) => {
-      if (error.message === 'Account with email not found.' || error.message === 'Incorrect password.') {
-        error.code = 401
-        error.message = 'Incorrect email or password.'
-      }
+			if (error.message === 'Account with email not found.' || error.message === 'Incorrect password.') {
+				error.code = 401
+				error.message = 'Incorrect email or password.'
+			}
+			next(error)
+		})
+}
+
+export function deleteSession(request, response, next) {
+	const session = request.session
+	const sessionID = request.sessionID
+	return deleteSessionDoc(session)
+		.then(() => {
+			response.sendStatus(204)
+		})
+		.catch((error) => {
 			next(error)
 		})
 }
