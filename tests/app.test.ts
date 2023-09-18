@@ -37,6 +37,8 @@ describe('/api/users', () => {
 					expect(user.fullName).toBe('Michael Panong')
 					expect(user.email).toBe('michael.panong@example.com')
 					expect(user.password).not.toBe('M3!qBsx7Sf8Hy6')
+					expect(user.workspaces[0]).toHaveProperty('workspaceId')
+					expect(user.workspaces[0].workspaceName).toBe('Personal')
 				})
 		})
 		test('status 400 - missing full name', () => {

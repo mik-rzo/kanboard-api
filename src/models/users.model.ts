@@ -1,5 +1,6 @@
 import pool from '../db/connection.js'
 import bcrypt from 'bcrypt'
+import { ObjectId } from 'mongodb'
 
 interface UserRequestBody {
 	fullName: string
@@ -19,6 +20,12 @@ export function createUser(user: UserRequestBody) {
 			return Promise.all([pool, user])
 		})
 		.then(([db, user]) => {
+			user.workspaces = [
+				{
+					workspaceId: new ObjectId(),
+					workspaceName: 'Personal'
+				}
+			]
 			return db.collection('users').insertOne(user)
 		})
 		.then((result) => {
@@ -35,17 +42,23 @@ export function findUserById(userID) {
 			return db.collection('users').findOne({ _id: userID })
 		})
 		.then((result) => {
+			interface WorkspaceI {
+				workspaceId: string
+				workspaceName: string
+			}
 			interface UserResponseBody {
 				_id: string
 				fullName: string
 				email: string
 				password: string
+				workspaces: WorkspaceI[]
 			}
 			const user: UserResponseBody = {
 				_id: result._id.toString(),
 				fullName: result.fullName,
 				email: result.email,
-				password: result.password
+				password: result.password,
+				workspaces: [{ ...result.workspaces[0], workspaceId: result.workspaces[0].workspaceId.toString() }]
 			}
 			return user
 		})
