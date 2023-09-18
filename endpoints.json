@@ -19,5 +19,8 @@
 			"email": "michael.panong@example.com",
 			"password": "M3!qBsx7Sf8Hy6"
 		}
+	},
+	"DELETE /api/sessions": {
+		"description": "deletes user session if the user has a valid session cookie"
 	}
 }
