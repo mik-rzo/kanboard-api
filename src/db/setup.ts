@@ -25,8 +25,7 @@ export async function setup() {
 					},
 					workspaces: {
 						bsonType: 'array',
-						minItems: 1,
-						description: "'workspaces' must be an array and must contain at least one item",
+						description: "'workspaces' must be an array",
 						items: {
 							bsonType: 'object',
 							required: ['workspaceId', 'workspaceName'],
