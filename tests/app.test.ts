@@ -41,7 +41,7 @@ describe('/api/users', () => {
 					expect(user.workspaces[0].workspaceName).toBe('Personal')
 				})
 		})
-		test('status 400 - missing full name', () => {
+		test('status 400 - missing full name property', () => {
 			interface UserI {
 				fullName?: string
 				email?: string
@@ -60,7 +60,7 @@ describe('/api/users', () => {
 					expect(message).toBe('Missing required information.')
 				})
 		})
-		test('status 400 - missing email', () => {
+		test('status 400 - missing email property', () => {
 			interface UserI {
 				fullName?: string
 				email?: string
@@ -79,7 +79,7 @@ describe('/api/users', () => {
 					expect(message).toBe('Missing required information.')
 				})
 		})
-		test('status 400 - missing password', () => {
+		test('status 400 - missing password property', () => {
 			interface UserI {
 				fullName?: string
 				email?: string
@@ -142,7 +142,7 @@ describe('/api/sessions', () => {
 					expect(/(?:sessionID)/.test(cookie)).toBe(true)
 				})
 		})
-		test('status 400 - missing email', () => {
+		test('status 400 - missing email property', () => {
 			interface LoginI {
 				email?: string
 				password?: string
@@ -159,7 +159,7 @@ describe('/api/sessions', () => {
 					expect(message).toBe('Missing email or password.')
 				})
 		})
-		test('status 400 - missing password', () => {
+		test('status 400 - missing password property', () => {
 			interface LoginI {
 				email?: string
 				password?: string
