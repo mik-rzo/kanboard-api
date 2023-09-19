@@ -3,6 +3,6 @@ import { postUser } from '../controllers/users.controller.js'
 
 const usersRouter = Router()
 
-usersRouter.post('/', postUser)
+usersRouter.route('/').post(postUser)
 
 export default usersRouter
