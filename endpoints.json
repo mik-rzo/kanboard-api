@@ -28,5 +28,17 @@
 	},
 	"DELETE /api/sessions": {
 		"description": "deletes user session if the user has a valid session cookie"
+	},
+	"POST /api/workspaces": {
+		"description": "accepts a workspace object and updates the user's workspaces",
+		"exampleRequest": {
+			"workspaceName": "Buggy Bears"
+		},
+		"exampleResponse": {
+			"workspace": {
+				"workspaceId": "650b2753974c18dbbb183101",
+				"workspaceName": "Buggy Bears"
+			}
+		}
 	}
 }
