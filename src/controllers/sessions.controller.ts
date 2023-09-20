@@ -16,7 +16,6 @@ export function postSession(request, response, next) {
 
 export function deleteSession(request, response, next) {
 	const session = request.session
-	const sessionID = request.sessionID
 	return deleteSessionDoc(session)
 		.then(() => {
 			response.sendStatus(204)

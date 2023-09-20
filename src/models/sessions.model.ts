@@ -13,11 +13,11 @@ export function insertSession(login: LoginRequestBody, session) {
 	const { email } = login
 	return findUserByEmail(email)
 		.then((user) => {
-			return bcrypt.compare(login.password, user.password)
+			return Promise.all([bcrypt.compare(login.password, user.password), user])
 		})
-		.then((result) => {
+		.then(([result, user]) => {
 			if (result === true) {
-				session.authenticated = result
+				session.authenticated = user._id
 				return Promise.resolve()
 			} else {
 				return Promise.reject({ message: 'Incorrect password.' })

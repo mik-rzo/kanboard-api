@@ -37,9 +37,11 @@ describe('/api/users', () => {
 					expect(user.fullName).toBe('Michael Panong')
 					expect(user.email).toBe('michael.panong@example.com')
 					expect(user.password).not.toBe('M3!qBsx7Sf8Hy6')
+					expect(user.workspaces[0]).toHaveProperty('workspaceId')
+					expect(user.workspaces[0].workspaceName).toBe('Personal')
 				})
 		})
-		test('status 400 - missing full name', () => {
+		test('status 400 - missing full name property', () => {
 			interface UserI {
 				fullName?: string
 				email?: string
@@ -58,7 +60,7 @@ describe('/api/users', () => {
 					expect(message).toBe('Missing required information.')
 				})
 		})
-		test('status 400 - missing email', () => {
+		test('status 400 - missing email property', () => {
 			interface UserI {
 				fullName?: string
 				email?: string
@@ -77,7 +79,7 @@ describe('/api/users', () => {
 					expect(message).toBe('Missing required information.')
 				})
 		})
-		test('status 400 - missing password', () => {
+		test('status 400 - missing password property', () => {
 			interface UserI {
 				fullName?: string
 				email?: string
@@ -140,7 +142,7 @@ describe('/api/sessions', () => {
 					expect(/(?:sessionID)/.test(cookie)).toBe(true)
 				})
 		})
-		test('status 400 - missing email', () => {
+		test('status 400 - missing email property', () => {
 			interface LoginI {
 				email?: string
 				password?: string
@@ -157,7 +159,7 @@ describe('/api/sessions', () => {
 					expect(message).toBe('Missing email or password.')
 				})
 		})
-		test('status 400 - missing password', () => {
+		test('status 400 - missing password property', () => {
 			interface LoginI {
 				email?: string
 				password?: string
@@ -249,6 +251,76 @@ describe('/api/sessions', () => {
 				.then((response) => {
 					const { message } = response.body
 					expect(message).toBe('Already logged out.')
+				})
+		})
+	})
+})
+
+describe('/api/workspaces', () => {
+	describe('POST request', () => {
+		test("status 201 - accepts object with workspace name and updates user's workspaces array in database", () => {
+			interface LoginI {
+				email: string
+				password: string
+			}
+			interface WorkspaceI {
+				workspaceName: string
+			}
+			const login: LoginI = {
+				email: 'gabi.ramsay@example.com',
+				password: '2Vbikjlwe7wo'
+			}
+			const workspace: WorkspaceI = {
+				workspaceName: 'Buggy Bears'
+			}
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.then((response) => {
+					const cookie = response.headers['set-cookie']
+					return request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace).expect(201)
+				})
+				.then((response) => {
+					const { workspace } = response.body
+					expect(workspace).toHaveProperty('workspaceId')
+					expect(workspace.workspaceName).toBe('Buggy Bears')
+				})
+		})
+		test('status 400 - missing workspace name property', () => {
+			interface LoginI {
+				email: string
+				password: string
+			}
+			const login: LoginI = {
+				email: 'gabi.ramsay@example.com',
+				password: '2Vbikjlwe7wo'
+			}
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.then((response) => {
+					const cookie = response.headers['set-cookie']
+					return request(app).post('/api/workspaces').set('Cookie', cookie).send({}).expect(400)
+				})
+				.then((response) => {
+					const { message } = response.body
+					expect(message).toBe('Missing required information.')
+				})
+		})
+		test('status 401 - user is not authenticated', () => {
+			interface WorkspaceI {
+				workspaceName: string
+			}
+			const workspace: WorkspaceI = {
+				workspaceName: 'Buggy Bears'
+			}
+			return request(app)
+				.post('/api/workspaces')
+				.send(workspace)
+				.expect(401)
+				.then((response) => {
+					const { message } = response.body
+					expect(message).toBe('Not logged in.')
 				})
 		})
 	})

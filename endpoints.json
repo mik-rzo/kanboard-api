@@ -7,10 +7,18 @@
 			"password": "M3!qBsx7Sf8Hy6"
 		},
 		"exampleResponse": {
-			"_id": "64f71c09bd22c8de14b39180",
-			"fullName": "Michael Panong",
-			"email": "michael.panong@example.com",
-			"password": "$2b$10$4cw3lzkZiAcO4SrvuVjpQe/p1nH4z/6EtTob1AcWQy9o5n7CWIoRa"
+			"user": {
+				"_id": "64f71c09bd22c8de14b39180",
+				"fullName": "Michael Panong",
+				"email": "michael.panong@example.com",
+				"password": "$2b$10$4cw3lzkZiAcO4SrvuVjpQe/p1nH4z/6EtTob1AcWQy9o5n7CWIoRa",
+				"workspaces": [
+					{
+						"workspaceId": "650891add033299273ee36db",
+						"workspaceName": "Personal"
+					}
+				]
+			}
 		}
 	},
 	"POST /api/sessions": {
@@ -22,5 +30,17 @@
 	},
 	"DELETE /api/sessions": {
 		"description": "deletes user session if the user has a valid session cookie"
+	},
+	"POST /api/workspaces": {
+		"description": "accepts a workspace object and updates the user's workspaces",
+		"exampleRequest": {
+			"workspaceName": "Buggy Bears"
+		},
+		"exampleResponse": {
+			"workspace": {
+				"workspaceId": "650b2753974c18dbbb183101",
+				"workspaceName": "Buggy Bears"
+			}
+		}
 	}
 }

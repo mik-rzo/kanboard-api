@@ -1,5 +1,7 @@
 import pool from '../db/connection.js'
 import bcrypt from 'bcrypt'
+import { ObjectId } from 'mongodb'
+import { convertUserObjectIdsToString } from '../utils.js'
 
 interface UserRequestBody {
 	fullName: string
@@ -19,6 +21,12 @@ export function createUser(user: UserRequestBody) {
 			return Promise.all([pool, user])
 		})
 		.then(([db, user]) => {
+			user.workspaces = [
+				{
+					workspaceId: new ObjectId(),
+					workspaceName: 'Personal'
+				}
+			]
 			return db.collection('users').insertOne(user)
 		})
 		.then((result) => {
@@ -29,24 +37,24 @@ export function createUser(user: UserRequestBody) {
 		})
 }
 
-export function findUserById(userID) {
+export function findUserById(userId) {
 	return pool
 		.then((db) => {
-			return db.collection('users').findOne({ _id: userID })
+			return db.collection('users').findOne({ _id: userId })
 		})
 		.then((result) => {
+			interface WorkspaceI {
+				workspaceId: string
+				workspaceName: string
+			}
 			interface UserResponseBody {
 				_id: string
 				fullName: string
 				email: string
 				password: string
+				workspaces: WorkspaceI[]
 			}
-			const user: UserResponseBody = {
-				_id: result._id.toString(),
-				fullName: result.fullName,
-				email: result.email,
-				password: result.password
-			}
+			const user: UserResponseBody = convertUserObjectIdsToString(result)
 			return user
 		})
 }
@@ -60,18 +68,18 @@ export function findUserByEmail(email) {
 			if (result === null) {
 				return Promise.reject({ code: 404, message: 'Account with email not found.' })
 			}
+			interface WorkspaceI {
+				workspaceId: string
+				workspaceName: string
+			}
 			interface UserResponseBody {
 				_id: string
 				fullName: string
 				email: string
 				password: string
+				workspaces: WorkspaceI[]
 			}
-			const user: UserResponseBody = {
-				_id: result._id.toString(),
-				fullName: result.fullName,
-				email: result.email,
-				password: result.password
-			}
+			const user: UserResponseBody = convertUserObjectIdsToString(result)
 			return user
 		})
 }
