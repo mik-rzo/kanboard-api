@@ -255,3 +255,73 @@ describe('/api/sessions', () => {
 		})
 	})
 })
+
+describe('/api/workspaces', () => {
+	describe('POST request', () => {
+		test("status 201 - accepts object with workspace name and updates user's workspaces array in database", () => {
+			interface LoginI {
+				email: string
+				password: string
+			}
+			interface WorkspaceI {
+				workspaceName: string
+			}
+			const login: LoginI = {
+				email: 'gabi.ramsay@example.com',
+				password: '2Vbikjlwe7wo'
+			}
+			const workspace: WorkspaceI = {
+				workspaceName: 'Buggy Bears'
+			}
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.then((response) => {
+					const cookie = response.headers['set-cookie']
+					return request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace).expect(201)
+				})
+				.then((response) => {
+					const { workspace } = response.body
+					expect(workspace).toHaveProperty('workspaceId')
+					expect(workspace.workspaceName).toBe('Buggy Bears')
+				})
+		})
+		test('status 400 - missing workspace name property', () => {
+			interface LoginI {
+				email: string
+				password: string
+			}
+			const login: LoginI = {
+				email: 'gabi.ramsay@example.com',
+				password: '2Vbikjlwe7wo'
+			}
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.then((response) => {
+					const cookie = response.headers['set-cookie']
+					return request(app).post('/api/workspaces').set('Cookie', cookie).send({}).expect(400)
+				})
+				.then((response) => {
+					const { message } = response.body
+					expect(message).toBe('Missing required information.')
+				})
+		})
+		test('status 401 - user is not authenticated', () => {
+			interface WorkspaceI {
+				workspaceName: string
+			}
+			const workspace: WorkspaceI = {
+				workspaceName: 'Buggy Bears'
+			}
+			return request(app)
+				.post('/api/workspaces')
+				.send(workspace)
+				.expect(401)
+				.then((response) => {
+					const { message } = response.body
+					expect(message).toBe('Not logged in.')
+				})
+		})
+	})
+})
