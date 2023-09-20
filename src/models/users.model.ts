@@ -37,10 +37,10 @@ export function createUser(user: UserRequestBody) {
 		})
 }
 
-export function findUserById(userID) {
+export function findUserById(userId) {
 	return pool
 		.then((db) => {
-			return db.collection('users').findOne({ _id: userID })
+			return db.collection('users').findOne({ _id: userId })
 		})
 		.then((result) => {
 			interface WorkspaceI {
