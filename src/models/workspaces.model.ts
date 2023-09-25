@@ -3,9 +3,6 @@ import { findUserById } from './users.model.js'
 import { ObjectId } from 'mongodb'
 
 export function insertWorkspace(workspaceName, userId) {
-	if (!userId) {
-		return Promise.reject({ code: 401, message: 'Not logged in.' })
-	}
 	userId = new ObjectId(userId)
 	return pool
 		.then((db) => {

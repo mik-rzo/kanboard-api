@@ -44,6 +44,9 @@ export function findUserById(userId) {
 			return db.collection('users').findOne({ _id: userId })
 		})
 		.then((result) => {
+			if (result === null) {
+				return null
+			} 
 			interface UserResponseBody {
 				_id: string
 				fullName: string
