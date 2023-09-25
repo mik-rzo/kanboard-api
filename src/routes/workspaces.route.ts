@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { postWorkspace, patchWorkspace } from '../controllers/workspaces.controller.js'
-import { authentication } from '../auth.js'
+import { authentication } from '../authentication.js'
 
 const workspacesRouter = Router()
 
