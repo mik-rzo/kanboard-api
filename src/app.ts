@@ -67,6 +67,22 @@ app.use((error, request, response, next) => {
 })
 
 app.use((error, request, response, next) => {
+	if (error.code === 403) {
+		response.status(403).send({ message: error.message })
+	} else {
+		next(error)
+	}
+})
+
+app.use((error, request, response, next) => {
+	if (error.code === 404) {
+		response.status(404).send({ message: error.message })
+	} else {
+		next(error)
+	}
+})
+
+app.use((error, request, response, next) => {
 	if (error.code === 11000) {
 		response.status(409).send({ message: 'Account with this email already exists, please log in instead.' })
 	} else {

@@ -3,6 +3,7 @@ import request from 'supertest'
 import app from '../src/app'
 import { setup } from '../src/db/setup'
 import { seed } from '../src/db/seed'
+import { ObjectId } from 'mongodb'
 
 beforeEach(() => {
 	return setup().then(() => {
@@ -321,6 +322,209 @@ describe('/api/workspaces', () => {
 					const { message } = response.body
 					expect(message).toBe('Not logged in.')
 				})
+		})
+	})
+	describe('/:workspace_id', () => {
+		describe('PATCH request', () => {
+			test('status 200 - accepts object with workspace name and updates workspace matching ID', () => {
+				interface LoginI {
+					email: string
+					password: string
+				}
+				interface WorkspaceI {
+					workspaceName: string
+				}
+				const login: LoginI = {
+					email: 'gabi.ramsay@example.com',
+					password: '2Vbikjlwe7wo'
+				}
+				const workspace: WorkspaceI = {
+					workspaceName: 'Buggy Bears'
+				}
+				const renameWorkspace: WorkspaceI = {
+					workspaceName: 'Agile Aces'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postWorkspace = request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace)
+						return Promise.all([postWorkspace, cookie])
+					})
+					.then(([response, cookie]) => {
+						const workspaceId = response.body.workspace._id
+						return request(app)
+							.patch(`/api/workspaces/${workspaceId}`)
+							.set('Cookie', cookie)
+							.send(renameWorkspace)
+							.expect(200)
+					})
+					.then((response) => {
+						const { workspace } = response.body
+						expect(workspace).toHaveProperty('_id')
+						expect(workspace.name).toBe('Agile Aces')
+					})
+			})
+			test('status 400 - missing workspace name property', () => {
+				interface LoginI {
+					email: string
+					password: string
+				}
+				interface WorkspaceI {
+					workspaceName: string
+				}
+				const login: LoginI = {
+					email: 'gabi.ramsay@example.com',
+					password: '2Vbikjlwe7wo'
+				}
+				const workspace: WorkspaceI = {
+					workspaceName: 'Buggy Bears'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postWorkspace = request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace)
+						return Promise.all([postWorkspace, cookie])
+					})
+					.then(([response, cookie]) => {
+						const workspaceId = response.body.workspace._id
+						return request(app).patch(`/api/workspaces/${workspaceId}`).set('Cookie', cookie).send({}).expect(400)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('Missing required information.')
+					})
+			})
+			test('status 401 - user is not authenticated', () => {
+				interface LoginI {
+					email: string
+					password: string
+				}
+				interface WorkspaceI {
+					workspaceName: string
+				}
+				const login: LoginI = {
+					email: 'gabi.ramsay@example.com',
+					password: '2Vbikjlwe7wo'
+				}
+				const workspace: WorkspaceI = {
+					workspaceName: 'Buggy Bears'
+				}
+				const renameWorkspace: WorkspaceI = {
+					workspaceName: 'Agile Aces'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postWorkspace = request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace)
+						return Promise.all([postWorkspace, cookie])
+					})
+					.then(([response, cookie]) => {
+						const workspaceId = response.body.workspace._id
+						const logout = request(app).delete('/api/sessions').set('Cookie', cookie)
+						return Promise.all([logout, workspaceId, cookie])
+					})
+					.then(([response, workspaceId, cookie]) => {
+						return request(app)
+							.patch(`/api/workspaces/${workspaceId}`)
+							.set('Cookie', cookie)
+							.send(renameWorkspace)
+							.expect(401)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('Not logged in.')
+					})
+			})
+			test('status 403 - user does not have permission to change workspace name', () => {
+				interface LoginI {
+					email: string
+					password: string
+				}
+				interface WorkspaceI {
+					workspaceName: string
+				}
+				const loginGabi: LoginI = {
+					email: 'gabi.ramsay@example.com',
+					password: '2Vbikjlwe7wo'
+				}
+				const loginZara: LoginI = {
+					email: 'zara.russel@example.com',
+					password: 'fddnQzxuqerp'
+				}
+				const workspace: WorkspaceI = {
+					workspaceName: 'Buggy Bears'
+				}
+				const renameWorkspace: WorkspaceI = {
+					workspaceName: 'Agile Aces'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(loginGabi)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postWorkspace = request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace)
+						return Promise.all([postWorkspace, cookie])
+					})
+					.then(([response, cookie]) => {
+						const workspaceId = response.body.workspace._id
+						const logout = request(app).delete('/api/sessions').set('Cookie', cookie)
+						return Promise.all([logout, workspaceId])
+					})
+					.then(([response, workspaceId]) => {
+						const loginAsDifferentUser = request(app).post('/api/sessions').send(loginZara)
+						return Promise.all([loginAsDifferentUser, workspaceId])
+					})
+					.then(([response, workspaceId]) => {
+						const cookie = response.headers['set-cookie']
+						return request(app)
+							.patch(`/api/workspaces/${workspaceId}`)
+							.set('Cookie', cookie)
+							.send(renameWorkspace)
+							.expect(403)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('Not authorized.')
+					})
+			})
+			test('status 404 - could not find workspace matching id', () => {
+				interface LoginI {
+					email: string
+					password: string
+				}
+				interface WorkspaceI {
+					workspaceName: string
+				}
+				const login: LoginI = {
+					email: 'gabi.ramsay@example.com',
+					password: '2Vbikjlwe7wo'
+				}
+				const renameWorkspace: WorkspaceI = {
+					workspaceName: 'Agile Aces'
+				}
+				const workspaceId = new ObjectId()
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						return request(app)
+							.patch(`/api/workspaces/${workspaceId}`)
+							.set('Cookie', cookie)
+							.send(renameWorkspace)
+							.expect(404)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('Workspace matching ID not found.')
+					})
+			})
 		})
 	})
 })
