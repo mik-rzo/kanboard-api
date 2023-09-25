@@ -12,12 +12,7 @@
 				"fullName": "Michael Panong",
 				"email": "michael.panong@example.com",
 				"password": "$2b$10$4cw3lzkZiAcO4SrvuVjpQe/p1nH4z/6EtTob1AcWQy9o5n7CWIoRa",
-				"workspaces": [
-					{
-						"workspaceId": "650891add033299273ee36db",
-						"workspaceName": "Personal"
-					}
-				]
+				"workspaces": ["650891add033299273ee36db"]
 			}
 		}
 	},
@@ -38,8 +33,8 @@
 		},
 		"exampleResponse": {
 			"workspace": {
-				"workspaceId": "650b2753974c18dbbb183101",
-				"workspaceName": "Buggy Bears"
+				"_id": "650b2753974c18dbbb183101",
+				"name": "Buggy Bears"
 			}
 		}
 	}
