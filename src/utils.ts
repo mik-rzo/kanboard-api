@@ -4,8 +4,8 @@ export function convertUserObjectIdsToString(user) {
 		fullName: user.fullName,
 		email: user.email,
 		password: user.password,
-		workspaces: user.workspaces.map((workspace) => {
-			return { ...workspace, workspaceId: workspace.workspaceId.toString() }
+		workspaces: user.workspaces.map((workspaceId) => {
+			return workspaceId.toString()
 		})
 	}
 }

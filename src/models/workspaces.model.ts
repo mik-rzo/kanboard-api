@@ -7,27 +7,39 @@ export function insertWorkspace(workspaceName, userId) {
 		return Promise.reject({ code: 401, message: 'Not logged in.' })
 	}
 	userId = new ObjectId(userId)
-	return findUserById(userId)
-		.then((user) => {
+	return pool
+		.then((db) => {
+			const insertWorkspaceDoc = db.collection('workspaces').insertOne({ name: workspaceName })
+			return Promise.all([insertWorkspaceDoc, db])
+		})
+		.then(([result, db]) => {
+			return Promise.all([findUserById(userId), result.insertedId, db])
+		})
+		.then(([user, workspaceId, db]) => {
+			const workspaces = [...user.workspaces]
+			workspaces.push(workspaceId.toString())
+			const updateUserDoc = db.collection('users').updateOne({ _id: userId }, { $set: { workspaces: workspaces } })
+			return Promise.all([updateUserDoc, workspaceId])
+		})
+		.then(([result, workspaceId]) => {
+			return findWorkspaceById(workspaceId)
+		})
+}
+
+export function findWorkspaceById(workspaceId) {
+	return pool
+		.then((db) => {
+			return db.collection('workspaces').findOne({ _id: workspaceId })
+		})
+		.then((result) => {
 			interface WorkspaceI {
-				workspaceId: ObjectId
-				workspaceName: string
+				_id: string
+				name: string
 			}
-			const workspaces: WorkspaceI[] = user.workspaces.map((workspace) => {
-				return { ...workspace, workspaceId: new ObjectId(workspace.workspaceId) }
-			})
-			const newWorkspace: WorkspaceI = {
-				workspaceId: new ObjectId(),
-				workspaceName: workspaceName
+			const workspace: WorkspaceI = {
+				_id: result._id.toString(),
+				name: result.name
 			}
-			workspaces.push(newWorkspace)
-			return Promise.all([pool, workspaces, newWorkspace])
-		})
-		.then(([db, updatedWorkspaces, newWorkspace]) => {
-			const updateDb = db.collection('users').updateOne({ _id: userId }, { $set: { workspaces: updatedWorkspaces } })
-			return Promise.all([updateDb, newWorkspace])
-		})
-		.then(([updateResult, newWorkspace]) => {
-			return newWorkspace
+			return workspace
 		})
 }

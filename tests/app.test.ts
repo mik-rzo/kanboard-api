@@ -37,8 +37,7 @@ describe('/api/users', () => {
 					expect(user.fullName).toBe('Michael Panong')
 					expect(user.email).toBe('michael.panong@example.com')
 					expect(user.password).not.toBe('M3!qBsx7Sf8Hy6')
-					expect(user.workspaces[0]).toHaveProperty('workspaceId')
-					expect(user.workspaces[0].workspaceName).toBe('Personal')
+					expect(user.workspaces[0]).toBeTypeOf('string')
 				})
 		})
 		test('status 400 - missing full name property', () => {
@@ -282,8 +281,8 @@ describe('/api/workspaces', () => {
 				})
 				.then((response) => {
 					const { workspace } = response.body
-					expect(workspace).toHaveProperty('workspaceId')
-					expect(workspace.workspaceName).toBe('Buggy Bears')
+					expect(workspace).toHaveProperty('_id')
+					expect(workspace.name).toBe('Buggy Bears')
 				})
 		})
 		test('status 400 - missing workspace name property', () => {

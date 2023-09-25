@@ -3,6 +3,7 @@ import pool from './connection.js'
 export async function setup() {
 	const db = await pool
 	await db.collection('users').drop()
+	await db.collection('workspaces').drop()
 	await db.collection('sessions').drop()
 	await db.createCollection('users', {
 		validator: {
@@ -27,19 +28,23 @@ export async function setup() {
 						bsonType: 'array',
 						description: "'workspaces' must be an array",
 						items: {
-							bsonType: 'object',
-							required: ['workspaceId', 'workspaceName'],
-							properties: {
-								workspaceId: {
-									bsonType: 'objectId',
-									description: "'workspaceId' must be a unique object ID and is required"
-								},
-								workspaceName: {
-									bsonType: 'string',
-									description: "'workspaceName' must be a string and is required"
-								}
-							}
+							bsonType: 'string'
 						}
+					}
+				}
+			}
+		}
+	})
+	await db.createCollection('workspaces', {
+		validator: {
+			$jsonSchema: {
+				bsonType: 'object',
+				title: 'Workspace Object Validation',
+				required: ['name'],
+				properties: {
+					name: {
+						bsonType: 'string',
+						description: "'name' must be a string and is required"
 					}
 				}
 			}

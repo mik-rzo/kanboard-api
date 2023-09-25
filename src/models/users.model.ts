@@ -21,16 +21,17 @@ export function createUser(user: UserRequestBody) {
 			return Promise.all([pool, user])
 		})
 		.then(([db, user]) => {
-			user.workspaces = [
-				{
-					workspaceId: new ObjectId(),
-					workspaceName: 'Personal'
-				}
-			]
-			return db.collection('users').insertOne(user)
+			const personalWorkspaceId = new ObjectId()
+			user.workspaces = [personalWorkspaceId.toString()]
+			const insertUserDoc = db.collection('users').insertOne(user)
+			const insertWorkspaceDoc = db.collection('workspaces').insertOne({
+				_id: personalWorkspaceId,
+				name: 'Personal'
+			})
+			return Promise.all([insertUserDoc, insertWorkspaceDoc])
 		})
-		.then((result) => {
-			return result.insertedId
+		.then(([user, workspace]) => {
+			return user.insertedId
 		})
 		.then((id) => {
 			return findUserById(id)
@@ -43,16 +44,12 @@ export function findUserById(userId) {
 			return db.collection('users').findOne({ _id: userId })
 		})
 		.then((result) => {
-			interface WorkspaceI {
-				workspaceId: string
-				workspaceName: string
-			}
 			interface UserResponseBody {
 				_id: string
 				fullName: string
 				email: string
 				password: string
-				workspaces: WorkspaceI[]
+				workspaces: string[]
 			}
 			const user: UserResponseBody = convertUserObjectIdsToString(result)
 			return user
@@ -68,16 +65,12 @@ export function findUserByEmail(email) {
 			if (result === null) {
 				return Promise.reject({ code: 404, message: 'Account with email not found.' })
 			}
-			interface WorkspaceI {
-				workspaceId: string
-				workspaceName: string
-			}
 			interface UserResponseBody {
 				_id: string
 				fullName: string
 				email: string
 				password: string
-				workspaces: WorkspaceI[]
+				workspaces: string[]
 			}
 			const user: UserResponseBody = convertUserObjectIdsToString(result)
 			return user
