@@ -1,6 +1,6 @@
 {
 	"POST /api/users": {
-		"description": "accepts a user object and adds the user to the database",
+		"description": "accepts user details and adds the user to the database",
 		"exampleRequest": {
 			"fullName": "Michael Panong",
 			"email": "michael.panong@example.com",
@@ -17,7 +17,7 @@
 		}
 	},
 	"POST /api/sessions": {
-		"description": "accepts a login object and creates a user session if login details are valid",
+		"description": "accepts login details and creates a user session if login details are valid",
 		"exampleRequest": {
 			"email": "michael.panong@example.com",
 			"password": "M3!qBsx7Sf8Hy6"
@@ -27,7 +27,7 @@
 		"description": "deletes user session if the user has a valid session cookie"
 	},
 	"POST /api/workspaces": {
-		"description": "accepts a workspace object and updates the user's workspaces",
+		"description": "accepts workspace name and adds the workspace to the database",
 		"exampleRequest": {
 			"workspaceName": "Buggy Bears"
 		},
