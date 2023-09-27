@@ -37,5 +37,17 @@
 				"name": "Buggy Bears"
 			}
 		}
+	},
+	"PATCH /api/workspaces/:workspace_id": {
+		"description": "accepts workspace name and renames existing workspace matching ID",
+		"exampleRequest": {
+			"workspaceName": "Agile Aces"
+		},
+		"exampleResponse": {
+			"workspace": {
+				"_id": "651425e797d2e1dc6efe3539",
+				"name": "Agile Aces"
+			}
+		}
 	}
 }
