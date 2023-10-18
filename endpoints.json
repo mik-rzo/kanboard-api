@@ -38,7 +38,7 @@
 			}
 		}
 	},
-	"PATCH /api/workspaces/:workspace_id": {
+	"PATCH /api/workspaces/:workspace_id/name": {
 		"description": "accepts workspace name and renames existing workspace matching ID",
 		"exampleRequest": {
 			"workspaceName": "Agile Aces"
