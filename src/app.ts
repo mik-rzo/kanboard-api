@@ -12,13 +12,20 @@ app.use(express.json())
 
 dotenv.config({ path: new URL(`../../.env.${app.get('env')}`, import.meta.url) })
 
-const sessionStore = new MongoDBStore({
-	uri:
-		app.get('env') !== 'production'
-			? `mongodb://localhost:27017/${process.env.MONGODB_DATABASE}`
-			: process.env.MONGO_URL,
-	collection: 'sessions'
-})
+const sessionStore = new MongoDBStore(
+	{
+		uri:
+			app.get('env') !== 'production'
+				? `mongodb://localhost:27017/${process.env.MONGODB_DATABASE}`
+				: process.env.MONGO_URL,
+		collection: 'sessions'
+	},
+	function (error) {
+		if (error) {
+			console.log(error)
+		}
+	}
+)
 
 app.use(
 	session({
