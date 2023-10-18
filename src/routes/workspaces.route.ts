@@ -6,6 +6,6 @@ const workspacesRouter = Router()
 
 workspacesRouter.route('/').post(authentication, postWorkspace)
 
-workspacesRouter.route('/:workspace_id').patch(authentication, patchWorkspace)
+workspacesRouter.route('/:workspace_id/name').patch(authentication, patchWorkspace)
 
 export default workspacesRouter

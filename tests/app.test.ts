@@ -325,7 +325,7 @@ describe('/api/workspaces', () => {
 				})
 		})
 	})
-	describe('/:workspace_id', () => {
+	describe('/:workspace_id/name', () => {
 		describe('PATCH request', () => {
 			test('status 200 - accepts object with workspace name and updates workspace matching ID', () => {
 				interface LoginI {
@@ -356,7 +356,7 @@ describe('/api/workspaces', () => {
 					.then(([response, cookie]) => {
 						const workspaceId = response.body.workspace._id
 						return request(app)
-							.patch(`/api/workspaces/${workspaceId}`)
+							.patch(`/api/workspaces/${workspaceId}/name`)
 							.set('Cookie', cookie)
 							.send(renameWorkspace)
 							.expect(200)
@@ -393,7 +393,7 @@ describe('/api/workspaces', () => {
 					})
 					.then(([response, cookie]) => {
 						const workspaceId = response.body.workspace._id
-						return request(app).patch(`/api/workspaces/${workspaceId}`).set('Cookie', cookie).send({}).expect(400)
+						return request(app).patch(`/api/workspaces/${workspaceId}/name`).set('Cookie', cookie).send({}).expect(400)
 					})
 					.then((response) => {
 						const { message } = response.body
@@ -433,7 +433,7 @@ describe('/api/workspaces', () => {
 					})
 					.then(([response, workspaceId, cookie]) => {
 						return request(app)
-							.patch(`/api/workspaces/${workspaceId}`)
+							.patch(`/api/workspaces/${workspaceId}/name`)
 							.set('Cookie', cookie)
 							.send(renameWorkspace)
 							.expect(401)
@@ -485,7 +485,7 @@ describe('/api/workspaces', () => {
 					.then(([response, workspaceId]) => {
 						const cookie = response.headers['set-cookie']
 						return request(app)
-							.patch(`/api/workspaces/${workspaceId}`)
+							.patch(`/api/workspaces/${workspaceId}/name`)
 							.set('Cookie', cookie)
 							.send(renameWorkspace)
 							.expect(403)
@@ -517,7 +517,7 @@ describe('/api/workspaces', () => {
 					.then((response) => {
 						const cookie = response.headers['set-cookie']
 						return request(app)
-							.patch(`/api/workspaces/${workspaceId}`)
+							.patch(`/api/workspaces/${workspaceId}/name`)
 							.set('Cookie', cookie)
 							.send(renameWorkspace)
 							.expect(404)
