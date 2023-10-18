@@ -59,12 +59,12 @@ describe('convertWorkspaceObjectIdsToString()', () => {
 	test('returns a new object', () => {
 		interface WorkspaceI {
 			_id: ObjectId
-			workspaceName: string
+			name: string
 			users: ObjectId[]
 		}
 		const workspace: WorkspaceI = {
 			_id: new ObjectId(),
-			workspaceName: 'Buggy Bears',
+			name: 'Buggy Bears',
 			users: [new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId()]
 		}
 		const output = convertWorkspaceObjectIdsToString(workspace)
@@ -75,12 +75,12 @@ describe('convertWorkspaceObjectIdsToString()', () => {
 	test('converts all objectIds to strings', () => {
 		interface WorkspaceI {
 			_id: ObjectId
-			workspaceName: string
+			name: string
 			users: ObjectId[]
 		}
 		const workspace: WorkspaceI = {
 			_id: new ObjectId(),
-			workspaceName: 'Buggy Bears',
+			name: 'Buggy Bears',
 			users: [new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId()]
 		}
 		const output = convertWorkspaceObjectIdsToString(workspace)
@@ -92,7 +92,7 @@ describe('convertWorkspaceObjectIdsToString()', () => {
 	test('does not mutate the object', () => {
 		const input = {
 			_id: new ObjectId('65200dee4d6406e7cedc7d16'),
-			workspaceName: 'Buggy Bears',
+			name: 'Buggy Bears',
 			users: [
 				new ObjectId('65200dee4d6406e7cedc7d17'),
 				new ObjectId('65200dee4d6406e7cedc7d18'),
@@ -103,7 +103,7 @@ describe('convertWorkspaceObjectIdsToString()', () => {
 		}
 		const control = {
 			_id: new ObjectId('65200dee4d6406e7cedc7d16'),
-			workspaceName: 'Buggy Bears',
+			name: 'Buggy Bears',
 			users: [
 				new ObjectId('65200dee4d6406e7cedc7d17'),
 				new ObjectId('65200dee4d6406e7cedc7d18'),
