@@ -47,8 +47,9 @@ export function addWorkspaceUser(workspaceId, userId) {
 			return Promise.all([db.collection('workspaces').findOne({ _id: workspaceId }), db])
 		})
 		.then(([workspace, db]) => {
+			const duplicateUser: boolean = workspace.users.some((compareUserId: ObjectId) => compareUserId.equals(userId))
 			const updatedWorkspace =
-				workspace.users.includes(userId) === false ? addUserToWorkspace(workspace, userId) : workspace
+				duplicateUser === false ? addUserToWorkspace(workspace, userId) : workspace
 			return db.collection('workspaces').updateOne({ _id: workspaceId }, { $set: { users: updatedWorkspace.users } })
 		})
 		.then(() => {
