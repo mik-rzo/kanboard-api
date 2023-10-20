@@ -34,7 +34,8 @@
 		"exampleResponse": {
 			"workspace": {
 				"_id": "650b2753974c18dbbb183101",
-				"name": "Buggy Bears"
+				"name": "Buggy Bears",
+				"users": ["653283ea7a4d463a1db52023"]
 			}
 		}
 	},
@@ -46,7 +47,18 @@
 		"exampleResponse": {
 			"workspace": {
 				"_id": "651425e797d2e1dc6efe3539",
-				"name": "Agile Aces"
+				"name": "Agile Aces",
+				"users": ["653283ea7a4d463a1db52023"]
+			}
+		}
+	},
+	"PATCH /api/workspaces/:workspace_id/users": {
+		"description": "adds logged in user ID to users array of workspace matching ID",
+		"exampleResponse": {
+			"workspace": {
+				"_id": "651425e797d2e1dc6efe3539",
+				"name": "Agile Aces",
+				"users": ["653283ea7a4d463a1db52023", "653283ea7a4d463a1db52024"]
 			}
 		}
 	}
