@@ -1,5 +1,9 @@
 import { describe, test, expect } from 'vitest'
-import { convertUserObjectIdsToString, convertWorkspaceObjectIdsToString, addUserToWorkspace } from '../src/utils'
+import {
+	convertUserObjectIdsToString,
+	convertWorkspaceObjectIdsToString,
+	addUserToWorkspace
+} from '../src/utils'
 import { ObjectId } from 'mongodb'
 
 describe('convertUserObjectIdsToString()', () => {
@@ -143,11 +147,10 @@ describe('addUserToWorkspace()', () => {
 		const workspace: WorkspaceI = {
 			_id: new ObjectId(),
 			name: 'Buggy Bears',
-			users: [new ObjectId()]
+			users: [new ObjectId('65325f0b1423421bfa7277a3')]
 		}
-		const userId = new ObjectId()
-		const output = addUserToWorkspace(workspace, userId)
-		expect(output.users.includes(userId)).toBe(true)
+		const output = addUserToWorkspace(workspace, new ObjectId('65325f0b1423421bfa7277a4'))
+		expect(output.users.some((userId) => userId.equals(new ObjectId('65325f0b1423421bfa7277a4')))).toBe(true)
 	})
 	test('does not mutate the input', () => {
 		const input = {
