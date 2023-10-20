@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { convertUserObjectIdsToString, convertWorkspaceObjectIdsToString } from '../src/utils'
+import { convertUserObjectIdsToString, convertWorkspaceObjectIdsToString, addUserToWorkspace } from '../src/utils'
 import { ObjectId } from 'mongodb'
 
 describe('convertUserObjectIdsToString()', () => {
@@ -37,7 +37,7 @@ describe('convertUserObjectIdsToString()', () => {
 		const output = convertUserObjectIdsToString(user)
 		expect(output._id).toBeTypeOf('string')
 	})
-	test('does not mutate the object', () => {
+	test('does not mutate the input', () => {
 		const input = {
 			_id: new ObjectId('650b03752d79f6b6f822dae7'),
 			fullName: 'Michael Panong',
@@ -89,7 +89,7 @@ describe('convertWorkspaceObjectIdsToString()', () => {
 			expect(userId).toBeTypeOf('string')
 		})
 	})
-	test('does not mutate the object', () => {
+	test('does not mutate the input', () => {
 		const input = {
 			_id: new ObjectId('65200dee4d6406e7cedc7d16'),
 			name: 'Buggy Bears',
@@ -113,6 +113,54 @@ describe('convertWorkspaceObjectIdsToString()', () => {
 			]
 		}
 		convertWorkspaceObjectIdsToString(input)
+		expect(input).toEqual(control)
+	})
+})
+
+describe('addUserToWorkspace()', () => {
+	test('returns a new object', () => {
+		interface WorkspaceI {
+			_id: ObjectId
+			name: string
+			users: ObjectId[]
+		}
+		const workspace: WorkspaceI = {
+			_id: new ObjectId(),
+			name: 'Buggy Bears',
+			users: [new ObjectId()]
+		}
+		const output = addUserToWorkspace(workspace, new ObjectId())
+		expect(output).toBeTypeOf('object')
+		expect(Array.isArray(output)).toBe(false)
+		expect(output).not.toBe(workspace)
+	})
+	test('adds a new user ID to the users array', () => {
+		interface WorkspaceI {
+			_id: ObjectId
+			name: string
+			users: ObjectId[]
+		}
+		const workspace: WorkspaceI = {
+			_id: new ObjectId(),
+			name: 'Buggy Bears',
+			users: [new ObjectId()]
+		}
+		const userId = new ObjectId()
+		const output = addUserToWorkspace(workspace, userId)
+		expect(output.users.includes(userId)).toBe(true)
+	})
+	test('does not mutate the input', () => {
+		const input = {
+			_id: new ObjectId('65325f0b1423421bfa7277a2'),
+			name: 'Buggy Bears',
+			users: [new ObjectId('65325f0b1423421bfa7277a3')]
+		}
+		const control = {
+			_id: new ObjectId('65325f0b1423421bfa7277a2'),
+			name: 'Buggy Bears',
+			users: [new ObjectId('65325f0b1423421bfa7277a3')]
+		}
+		addUserToWorkspace(input, new ObjectId('65325f0b1423421bfa7277a4'))
 		expect(input).toEqual(control)
 	})
 })

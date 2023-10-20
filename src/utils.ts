@@ -16,3 +16,7 @@ export function convertWorkspaceObjectIdsToString(workspace) {
 		})
 	}
 }
+
+export function addUserToWorkspace(workspace, userId) {
+	return { ...workspace, users: [...workspace.users, userId] }
+}
