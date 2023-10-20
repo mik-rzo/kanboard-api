@@ -1,15 +1,8 @@
 import pool from '../db/connection.js'
 import bcrypt from 'bcrypt'
-import { ObjectId } from 'mongodb'
 import { convertUserObjectIdsToString } from '../utils.js'
 
-interface UserRequestBody {
-	fullName: string
-	email: string
-	password: string
-}
-
-export function createUser(user: UserRequestBody) {
+export function createUser(user) {
 	if (!user.password) {
 		return Promise.reject({ code: 121 }) // same error code thrown by Mongo driver when user document fails schema validation
 	}
@@ -21,20 +14,18 @@ export function createUser(user: UserRequestBody) {
 			return Promise.all([pool, user])
 		})
 		.then(([db, user]) => {
-			const personalWorkspaceId = new ObjectId()
-			user.workspaces = [personalWorkspaceId.toString()]
-			const insertUserDoc = db.collection('users').insertOne(user)
-			const insertWorkspaceDoc = db.collection('workspaces').insertOne({
-				_id: personalWorkspaceId,
-				name: 'Personal'
-			})
-			return Promise.all([insertUserDoc, insertWorkspaceDoc])
+			return Promise.all([db, db.collection('users').insertOne(user)])
 		})
-		.then(([user, workspace]) => {
-			return user.insertedId
+		.then(([db, result]) => {
+			const userId = result.insertedId
+			const workspace = {
+				name: 'Personal',
+				users: [userId]
+			}
+			return Promise.all([userId, db.collection('workspaces').insertOne(workspace)])
 		})
-		.then((id) => {
-			return findUserById(id)
+		.then(([userId, result]) => {
+			return findUserById(userId)
 		})
 }
 
@@ -46,15 +37,8 @@ export function findUserById(userId) {
 		.then((result) => {
 			if (result === null) {
 				return null
-			} 
-			interface UserResponseBody {
-				_id: string
-				fullName: string
-				email: string
-				password: string
-				workspaces: string[]
 			}
-			const user: UserResponseBody = convertUserObjectIdsToString(result)
+			const user = convertUserObjectIdsToString(result)
 			return user
 		})
 }
@@ -68,14 +52,7 @@ export function findUserByEmail(email) {
 			if (result === null) {
 				return Promise.reject({ code: 404, message: 'Account with email not found.' })
 			}
-			interface UserResponseBody {
-				_id: string
-				fullName: string
-				email: string
-				password: string
-				workspaces: string[]
-			}
-			const user: UserResponseBody = convertUserObjectIdsToString(result)
+			const user = convertUserObjectIdsToString(result)
 			return user
 		})
 }

@@ -3,40 +3,39 @@ import bcrypt from 'bcrypt'
 import { ObjectId } from 'mongodb'
 
 interface UserI {
+	_id: ObjectId
 	fullName: string
 	email: string
 	password: string
-	workspaces: string[]
 }
 
 export async function seed() {
-	const workspaceIds = [new ObjectId(), new ObjectId(), new ObjectId()]
 	const users: UserI[] = [
 		{
+			_id: new ObjectId(),
 			fullName: 'Zara Russel',
 			email: 'zara.russel@example.com',
-			password: 'fddnQzxuqerp',
-			workspaces: [workspaceIds[0].toString()]
+			password: 'fddnQzxuqerp'
 		},
 		{
+			_id: new ObjectId(),
 			fullName: 'Gabi Ramsay',
 			email: 'gabi.ramsay@example.com',
-			password: '2Vbikjlwe7wo',
-			workspaces: [workspaceIds[1].toString()]
+			password: '2Vbikjlwe7wo'
 		},
 		{
+			_id: new ObjectId(),
 			fullName: 'Saul Goodman',
 			email: 'saul.goodman@example.com',
-			password: 'imfeym7q9nwj',
-			workspaces: [workspaceIds[2].toString()]
+			password: 'imfeym7q9nwj'
 		}
 	]
 	const db = await pool
 	for (let i = 0; i < users.length; i++) {
 		users[i].password = await bcrypt.hash(users[i].password, 5)
 		await db.collection('workspaces').insertOne({
-			_id: workspaceIds[i],
-			name: 'Personal'
+			name: 'Personal',
+			users: [users[i]._id]
 		})
 	}
 	await db.collection('users').insertMany(users)
