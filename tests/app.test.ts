@@ -608,7 +608,6 @@ describe('/api/workspaces', () => {
 					})
 					.then((response) => {
 						const { workspace } = response.body
-						console.log(workspace)
 						expect(workspace).toHaveProperty('_id')
 						expect(workspace.name).toBe('Agile Aces')
 						expect(Array.isArray(workspace.users)).toBe(true)
