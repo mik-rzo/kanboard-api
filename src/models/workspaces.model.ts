@@ -1,6 +1,6 @@
 import pool from '../db/connection.js'
 import { ObjectId } from 'mongodb'
-import { convertWorkspaceObjectIdsToString } from '../utils.js'
+import { convertWorkspaceObjectIdsToString, addUserToWorkspace } from '../utils.js'
 
 export function insertWorkspace(workspaceName, userId) {
 	userId = new ObjectId(userId)
@@ -34,7 +34,27 @@ export function updateWorkspaceName(workspaceId, workspaceName) {
 		.then((db) => {
 			return db.collection('workspaces').updateOne({ _id: workspaceId }, { $set: { name: workspaceName } })
 		})
-		.then((result) => {
+		.then(() => {
+			return findWorkspaceById(workspaceId)
+		})
+}
+
+export function addWorkspaceUser(workspaceId, userId) {
+	workspaceId = new ObjectId(workspaceId)
+	userId = new ObjectId(userId)
+	return pool
+		.then((db) => {
+			return Promise.all([findWorkspaceById(workspaceId), db])
+		})
+		.then(([workspace, db]) => {
+			const updatedWorkspace =
+				workspace.users.includes(userId) === false ? addUserToWorkspace(workspace, userId) : workspace
+			updatedWorkspace.users = updatedWorkspace.users.map((userId) => {
+				return new ObjectId(userId)
+			})
+			return db.collection('workspaces').updateOne({ _id: workspaceId }, { $set: { users: updatedWorkspace.users } })
+		})
+		.then(() => {
 			return findWorkspaceById(workspaceId)
 		})
 }

@@ -529,4 +529,120 @@ describe('/api/workspaces', () => {
 			})
 		})
 	})
+	describe('/:workspace_id/users', () => {
+		describe('PATCH request', () => {
+			test('status 200 - adds user ID from session to users array of workspace matching workspace ID', () => {
+				interface LoginI {
+					email: string
+					password: string
+				}
+				interface WorkspaceI {
+					workspaceName: string
+				}
+				const loginGabi: LoginI = {
+					email: 'gabi.ramsay@example.com',
+					password: '2Vbikjlwe7wo'
+				}
+				const loginZara: LoginI = {
+					email: 'zara.russel@example.com',
+					password: 'fddnQzxuqerp'
+				}
+				const workspace: WorkspaceI = {
+					workspaceName: 'Agile Aces'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(loginGabi)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postWorkspace = request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace)
+						return Promise.all([postWorkspace, cookie])
+					})
+					.then(([response, cookie]) => {
+						const workspaceId = response.body.workspace._id
+						const logout = request(app).delete('/api/sessions').set('Cookie', cookie)
+						return Promise.all([logout, workspaceId])
+					})
+					.then(([response, workspaceId]) => {
+						const loginAsDifferentUser = request(app).post('/api/sessions').send(loginZara)
+						return Promise.all([loginAsDifferentUser, workspaceId])
+					})
+					.then(([response, workspaceId]) => {
+						const cookie = response.headers['set-cookie']
+						return request(app).patch(`/api/workspaces/${workspaceId}/users`).set('Cookie', cookie).expect(200)
+					})
+					.then((response) => {
+						const { workspace } = response.body
+						expect(workspace).toHaveProperty('_id')
+						expect(workspace.name).toBe('Agile Aces')
+						expect(Array.isArray(workspace.users)).toBe(true)
+						expect(workspace.users.length).toBe(2)
+					})
+			})
+			test('status 401 - user is not authenticated', () => {
+				interface LoginI {
+					email: string
+					password: string
+				}
+				interface WorkspaceI {
+					workspaceName: string
+				}
+				const login: LoginI = {
+					email: 'gabi.ramsay@example.com',
+					password: '2Vbikjlwe7wo'
+				}
+				const workspace: WorkspaceI = {
+					workspaceName: 'Agile Aces'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postWorkspace = request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace)
+						return Promise.all([postWorkspace, cookie])
+					})
+					.then(([response, cookie]) => {
+						const workspaceId = response.body.workspace._id
+						const logout = request(app).delete('/api/sessions').set('Cookie', cookie)
+						return Promise.all([logout, workspaceId, cookie])
+					})
+					.then(([response, workspaceId, cookie]) => {
+						return request(app).patch(`/api/workspaces/${workspaceId}/users`).set('Cookie', cookie).expect(401)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('Not logged in.')
+					})
+			})
+			test('status 404 - could not find workspace matching ID', () => {
+				interface LoginI {
+					email: string
+					password: string
+				}
+				interface WorkspaceI {
+					workspaceName: string
+				}
+				const login: LoginI = {
+					email: 'gabi.ramsay@example.com',
+					password: '2Vbikjlwe7wo'
+				}
+				const workspace: WorkspaceI = {
+					workspaceName: 'Agile Aces'
+				}
+				const workspaceId = new ObjectId()
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						return request(app).patch(`/api/workspaces/${workspaceId}/users`).set('Cookie', cookie).expect(404)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('Workspace matching ID not found.')
+					})
+			})
+		})
+	})
 })
