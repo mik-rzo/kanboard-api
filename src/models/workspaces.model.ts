@@ -44,14 +44,11 @@ export function addWorkspaceUser(workspaceId, userId) {
 	userId = new ObjectId(userId)
 	return pool
 		.then((db) => {
-			return Promise.all([findWorkspaceById(workspaceId), db])
+			return Promise.all([db.collection('workspaces').findOne({ _id: workspaceId }), db])
 		})
 		.then(([workspace, db]) => {
 			const updatedWorkspace =
 				workspace.users.includes(userId) === false ? addUserToWorkspace(workspace, userId) : workspace
-			updatedWorkspace.users = updatedWorkspace.users.map((userId) => {
-				return new ObjectId(userId)
-			})
 			return db.collection('workspaces').updateOne({ _id: workspaceId }, { $set: { users: updatedWorkspace.users } })
 		})
 		.then(() => {
