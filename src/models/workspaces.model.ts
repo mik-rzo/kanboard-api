@@ -28,6 +28,18 @@ export function findWorkspaceById(workspaceId) {
 		})
 }
 
+export function findWorkspacesByUser(userId) {
+	return pool
+		.then((db) => {
+			return db.collection('workspaces').find({users: new ObjectId(userId)}).toArray()
+		})
+		.then((result) => {
+			return result.map((workspace) => {
+				return convertWorkspaceObjectIdsToString(workspace)
+			})
+		})
+}
+
 export function updateWorkspaceName(workspaceId, workspaceName) {
 	workspaceId = new ObjectId(workspaceId)
 	return pool
@@ -48,8 +60,7 @@ export function addWorkspaceUser(workspaceId, userId) {
 		})
 		.then(([workspace, db]) => {
 			const duplicateUser: boolean = workspace.users.some((compareUserId: ObjectId) => compareUserId.equals(userId))
-			const updatedWorkspace =
-				duplicateUser === false ? addUserToWorkspace(workspace, userId) : workspace
+			const updatedWorkspace = duplicateUser === false ? addUserToWorkspace(workspace, userId) : workspace
 			return db.collection('workspaces').updateOne({ _id: workspaceId }, { $set: { users: updatedWorkspace.users } })
 		})
 		.then(() => {
