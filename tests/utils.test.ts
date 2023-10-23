@@ -2,7 +2,8 @@ import { describe, test, expect } from 'vitest'
 import {
 	convertUserObjectIdsToString,
 	convertWorkspaceObjectIdsToString,
-	addUserToWorkspace
+	addUserToWorkspace,
+	deleteUserFromWorkspace
 } from '../src/utils'
 import { ObjectId } from 'mongodb'
 
@@ -164,6 +165,53 @@ describe('addUserToWorkspace()', () => {
 			users: [new ObjectId('65325f0b1423421bfa7277a3')]
 		}
 		addUserToWorkspace(input, new ObjectId('65325f0b1423421bfa7277a4'))
+		expect(input).toEqual(control)
+	})
+})
+
+describe('deleteUserFromWorkspace()', () => {
+	test('returns a new object', () => {
+		interface WorkspaceI {
+			_id: ObjectId
+			name: string
+			users: ObjectId[]
+		}
+		const workspace: WorkspaceI = {
+			_id: new ObjectId(),
+			name: 'Buggy Bears',
+			users: [new ObjectId()]
+		}
+		const output = deleteUserFromWorkspace(workspace, new ObjectId())
+		expect(output).toBeTypeOf('object')
+		expect(Array.isArray(output)).toBe(false)
+		expect(output).not.toBe(workspace)
+	})
+	test('removes user ID from users array', () => {
+		interface WorkspaceI {
+			_id: ObjectId
+			name: string
+			users: ObjectId[]
+		}
+		const workspace: WorkspaceI = {
+			_id: new ObjectId(),
+			name: 'Buggy Bears',
+			users: [new ObjectId('65325f0b1423421bfa7277a3'), new ObjectId('65325f0b1423421bfa7277b4')]
+		}
+		const output = deleteUserFromWorkspace(workspace, new ObjectId('65325f0b1423421bfa7277b4'))
+		expect(output.users.some((userId) => userId.equals(new ObjectId('65325f0b1423421bfa7277b4')))).toBe(false)
+	})
+	test('does not mutate the input', () => {
+		const input = {
+			_id: new ObjectId('65325f0b1423421bfa7277b1'),
+			name: 'Buggy Bears',
+			users: [new ObjectId('65325f0b1423421bfa7277a3'), new ObjectId('65325f0b1423421bfa7277b4')]
+		}
+		const control = {
+			_id: new ObjectId('65325f0b1423421bfa7277b1'),
+			name: 'Buggy Bears',
+			users: [new ObjectId('65325f0b1423421bfa7277a3'), new ObjectId('65325f0b1423421bfa7277b4')]
+		}
+		deleteUserFromWorkspace(input, new ObjectId('65325f0b1423421bfa7277b4'))
 		expect(input).toEqual(control)
 	})
 })
