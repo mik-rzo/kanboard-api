@@ -12,19 +12,19 @@ interface UserI {
 export async function seed() {
 	const users: UserI[] = [
 		{
-			_id: new ObjectId(),
+			_id: new ObjectId('64f71c09bd22c8de14b39181'),
 			fullName: 'Zara Russel',
 			email: 'zara.russel@example.com',
 			password: 'fddnQzxuqerp'
 		},
 		{
-			_id: new ObjectId(),
+			_id: new ObjectId('64f71c09bd22c8de14b39182'),
 			fullName: 'Gabi Ramsay',
 			email: 'gabi.ramsay@example.com',
 			password: '2Vbikjlwe7wo'
 		},
 		{
-			_id: new ObjectId(),
+			_id: new ObjectId('64f71c09bd22c8de14b39183'),
 			fullName: 'Saul Goodman',
 			email: 'saul.goodman@example.com',
 			password: 'imfeym7q9nwj'
