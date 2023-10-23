@@ -39,6 +39,24 @@
 			}
 		}
 	},
+	"GET /api/workspaces": {
+		"description": "sends an array of logged in user's workspaces",
+		"requiredQueries": ["userid"],
+		"exampleResponse": {
+			"workspaces": [
+				{
+					"_id": "6536aa7bf27882d92a00581b",
+					"name": "Personal",
+					"users": ["64f71c09bd22c8de14b39182"]
+				},
+				{
+					"_id": "6536aa7bf27882d92a00581d",
+					"name": "Buggy Bears",
+					"users": ["64f71c09bd22c8de14b39182"]
+				}
+			]
+		}
+	},
 	"PATCH /api/workspaces/:workspace_id/name": {
 		"description": "accepts workspace name and renames existing workspace matching ID",
 		"exampleRequest": {
