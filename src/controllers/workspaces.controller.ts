@@ -1,6 +1,7 @@
 import {
 	insertWorkspace,
 	findWorkspaceById,
+	findWorkspacesByUser,
 	authorization,
 	updateWorkspaceName,
 	addWorkspaceUser
@@ -17,6 +18,20 @@ export function postWorkspace(request, response, next) {
 		.catch((error) => {
 			next(error)
 		})
+}
+
+export function getUsersWorkspaces(request, response, next) {
+	const authenticatedUserId = request.session.authenticated
+	const { userid } = request.query
+	if (!userid) {
+		next({ code: 400, message: 'Missing required "userid" query string parameter.' })
+	} else if (userid !== authenticatedUserId) {
+		next({ code: 403, message: 'Not logged in as user matching "userid" query parameter.' })
+	} else {
+		return findWorkspacesByUser(authenticatedUserId).then((workspaces) => {
+			response.status(200).send({ workspaces: workspaces })
+		})
+	}
 }
 
 export function patchWorkspaceName(request, response, next) {
