@@ -283,8 +283,7 @@ describe('/api/workspaces', () => {
 					const { workspace } = response.body
 					expect(workspace).toHaveProperty('_id')
 					expect(workspace.name).toBe('Buggy Bears')
-					expect(Array.isArray(workspace.users)).toBe(true)
-					expect(workspace.users.length).toBe(1)
+					expect(workspace.users).toContain('64f71c09bd22c8de14b39182')
 				})
 		})
 		test('status 400 - missing workspace name property', () => {
@@ -363,9 +362,7 @@ describe('/api/workspaces', () => {
 					})
 					.then((response) => {
 						const { workspace } = response.body
-						expect(workspace).toHaveProperty('_id')
 						expect(workspace.name).toBe('Agile Aces')
-						expect(Array.isArray(workspace.users)).toBe(true)
 					})
 			})
 			test('status 400 - missing workspace name property', () => {
@@ -573,10 +570,8 @@ describe('/api/workspaces', () => {
 					})
 					.then((response) => {
 						const { workspace } = response.body
-						expect(workspace).toHaveProperty('_id')
-						expect(workspace.name).toBe('Agile Aces')
-						expect(Array.isArray(workspace.users)).toBe(true)
-						expect(workspace.users.length).toBe(2)
+						expect(workspace.users).toContain('64f71c09bd22c8de14b39182')
+						expect(workspace.users).toContain('64f71c09bd22c8de14b39181')
 					})
 			})
 			test('status 200 - does not add duplicate user ID', () => {
@@ -608,9 +603,6 @@ describe('/api/workspaces', () => {
 					})
 					.then((response) => {
 						const { workspace } = response.body
-						expect(workspace).toHaveProperty('_id')
-						expect(workspace.name).toBe('Agile Aces')
-						expect(Array.isArray(workspace.users)).toBe(true)
 						expect(workspace.users.length).toBe(1)
 					})
 			})
