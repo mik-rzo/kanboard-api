@@ -550,7 +550,7 @@ describe('/api/workspaces', () => {
 						expect(message).toBe('Not logged in.')
 					})
 			})
-			test('status 403 - user does not have permission to change workspace name', () => {
+			test('status 403 - user is not authorized to change workspace name', () => {
 				interface LoginI {
 					email: string
 					password: string
