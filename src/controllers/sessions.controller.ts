@@ -1,4 +1,4 @@
-import { insertSession, deleteSessionDoc } from '../models/sessions.model.js'
+import { insertSession, deleteSessionDocument } from '../models/sessions.model.js'
 
 export function postSession(request, response, next) {
 	insertSession(request.body, request.session)
@@ -16,7 +16,7 @@ export function postSession(request, response, next) {
 
 export function deleteSession(request, response, next) {
 	const session = request.session
-	return deleteSessionDoc(session)
+	return deleteSessionDocument(session)
 		.then(() => {
 			response.sendStatus(204)
 		})
