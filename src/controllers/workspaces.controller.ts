@@ -2,6 +2,7 @@ import {
 	insertWorkspace,
 	findWorkspaceById,
 	findWorkspacesByUser,
+	deleteWorkspaceDocument,
 	authorization,
 	updateWorkspaceName,
 	addWorkspaceUser
@@ -32,6 +33,27 @@ export function getUsersWorkspaces(request, response, next) {
 			response.status(200).send({ workspaces: workspaces })
 		})
 	}
+}
+
+export function deleteWorkspace(request, response, next) {
+	const authenticatedUserId = request.session.authenticated
+	const { workspace_id } = request.params
+	return findWorkspaceById(new ObjectId(workspace_id))
+		.then((workspace) => {
+			if (!workspace) {
+				return Promise.reject({ code: 404, message: 'Workspace matching ID not found.' })
+			}
+			return authorization(workspace_id, authenticatedUserId)
+		})
+		.then(() => {
+			return deleteWorkspaceDocument(workspace_id)
+		})
+		.then(() => {
+			response.sendStatus(204)
+		})
+		.catch((error) => {
+			next(error)
+		})
 }
 
 export function patchWorkspaceName(request, response, next) {
