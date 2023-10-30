@@ -104,8 +104,8 @@ describe('/api/users', () => {
 				password: string
 			}
 			const user: UserI = {
-				fullName: 'Saul Goodman',
-				email: 'saul.goodman@example.com',
+				fullName: 'Casper Nyström',
+				email: 'casper.nystrom@example.com',
 				password: 'imfeym7q9nwj'
 			}
 			return request(app)
@@ -128,7 +128,7 @@ describe('/api/sessions', () => {
 				password: string
 			}
 			const login: LoginI = {
-				email: 'saul.goodman@example.com',
+				email: 'casper.nystrom@example.com',
 				password: 'imfeym7q9nwj'
 			}
 			return request(app)
@@ -164,7 +164,7 @@ describe('/api/sessions', () => {
 				password?: string
 			}
 			const login: LoginI = {
-				email: 'saul.goodman@example.com'
+				email: 'casper.nystrom@example.com'
 			}
 			return request(app)
 				.post('/api/sessions')
@@ -199,7 +199,7 @@ describe('/api/sessions', () => {
 				password: string
 			}
 			const login: LoginI = {
-				email: 'saul.goodman@example.com',
+				email: 'casper.nystrom@example.com',
 				password: 'wrong-password'
 			}
 			return request(app)
@@ -219,7 +219,7 @@ describe('/api/sessions', () => {
 				password: string
 			}
 			const login: LoginI = {
-				email: 'zara.russel@example.com',
+				email: 'jake.weston@example.com',
 				password: 'fddnQzxuqerp'
 			}
 			return request(app)
@@ -266,7 +266,7 @@ describe('/api/workspaces', () => {
 				workspaceName: string
 			}
 			const login: LoginI = {
-				email: 'gabi.ramsay@example.com',
+				email: 'lisa.chen@example.com',
 				password: '2Vbikjlwe7wo'
 			}
 			const workspace: WorkspaceI = {
@@ -292,7 +292,7 @@ describe('/api/workspaces', () => {
 				password: string
 			}
 			const login: LoginI = {
-				email: 'gabi.ramsay@example.com',
+				email: 'lisa.chen@example.com',
 				password: '2Vbikjlwe7wo'
 			}
 			return request(app)
@@ -334,7 +334,7 @@ describe('/api/workspaces', () => {
 				workspaceName: string
 			}
 			const login: LoginI = {
-				email: 'gabi.ramsay@example.com',
+				email: 'lisa.chen@example.com',
 				password: '2Vbikjlwe7wo'
 			}
 			const workspace: WorkspaceI = {
@@ -372,7 +372,7 @@ describe('/api/workspaces', () => {
 				password: string
 			}
 			const login: LoginI = {
-				email: 'gabi.ramsay@example.com',
+				email: 'lisa.chen@example.com',
 				password: '2Vbikjlwe7wo'
 			}
 			return request(app)
@@ -393,7 +393,7 @@ describe('/api/workspaces', () => {
 				password: string
 			}
 			const login: LoginI = {
-				email: 'gabi.ramsay@example.com',
+				email: 'lisa.chen@example.com',
 				password: '2Vbikjlwe7wo'
 			}
 			return request(app)
@@ -418,7 +418,7 @@ describe('/api/workspaces', () => {
 				password: string
 			}
 			const login: LoginI = {
-				email: 'gabi.ramsay@example.com',
+				email: 'lisa.chen@example.com',
 				password: '2Vbikjlwe7wo'
 			}
 			return request(app)
@@ -445,7 +445,7 @@ describe('/api/workspaces', () => {
 					workspaceName: string
 				}
 				const login: LoginI = {
-					email: 'gabi.ramsay@example.com',
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
 				const workspace: WorkspaceI = {
@@ -480,7 +480,7 @@ describe('/api/workspaces', () => {
 					workspaceName: string
 				}
 				const login: LoginI = {
-					email: 'gabi.ramsay@example.com',
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
 				const workspace: WorkspaceI = {
@@ -513,7 +513,7 @@ describe('/api/workspaces', () => {
 					password: string
 				}
 				const login: LoginI = {
-					email: 'gabi.ramsay@example.com',
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
 				const workspaceId = new ObjectId()
@@ -537,12 +537,12 @@ describe('/api/workspaces', () => {
 				interface WorkspaceI {
 					workspaceName: string
 				}
-				const loginGabi: LoginI = {
-					email: 'gabi.ramsay@example.com',
+				const loginLisa: LoginI = {
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const loginZara: LoginI = {
-					email: 'zara.russel@example.com',
+				const loginJake: LoginI = {
+					email: 'jake.weston@example.com',
 					password: 'fddnQzxuqerp'
 				}
 				const workspace: WorkspaceI = {
@@ -550,7 +550,7 @@ describe('/api/workspaces', () => {
 				}
 				return request(app)
 					.post('/api/sessions')
-					.send(loginGabi)
+					.send(loginLisa)
 					.then((response) => {
 						const cookie = response.headers['set-cookie']
 						const postWorkspace = request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace)
@@ -562,7 +562,7 @@ describe('/api/workspaces', () => {
 						return Promise.all([logout, workspaceId])
 					})
 					.then(([response, workspaceId]) => {
-						const loginAsDifferentUser = request(app).post('/api/sessions').send(loginZara)
+						const loginAsDifferentUser = request(app).post('/api/sessions').send(loginJake)
 						return Promise.all([loginAsDifferentUser, workspaceId])
 					})
 					.then(([response, workspaceId]) => {
@@ -587,7 +587,7 @@ describe('/api/workspaces', () => {
 					workspaceName: string
 				}
 				const login: LoginI = {
-					email: 'gabi.ramsay@example.com',
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
 				const workspace: WorkspaceI = {
@@ -626,7 +626,7 @@ describe('/api/workspaces', () => {
 					workspaceName: string
 				}
 				const login: LoginI = {
-					email: 'gabi.ramsay@example.com',
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
 				const workspace: WorkspaceI = {
@@ -658,7 +658,7 @@ describe('/api/workspaces', () => {
 					workspaceName: string
 				}
 				const login: LoginI = {
-					email: 'gabi.ramsay@example.com',
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
 				const workspace: WorkspaceI = {
@@ -700,12 +700,12 @@ describe('/api/workspaces', () => {
 				interface WorkspaceI {
 					workspaceName: string
 				}
-				const loginGabi: LoginI = {
-					email: 'gabi.ramsay@example.com',
+				const loginLisa: LoginI = {
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const loginZara: LoginI = {
-					email: 'zara.russel@example.com',
+				const loginJake: LoginI = {
+					email: 'jake.weston@example.com',
 					password: 'fddnQzxuqerp'
 				}
 				const workspace: WorkspaceI = {
@@ -716,7 +716,7 @@ describe('/api/workspaces', () => {
 				}
 				return request(app)
 					.post('/api/sessions')
-					.send(loginGabi)
+					.send(loginLisa)
 					.then((response) => {
 						const cookie = response.headers['set-cookie']
 						const postWorkspace = request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace)
@@ -728,7 +728,7 @@ describe('/api/workspaces', () => {
 						return Promise.all([logout, workspaceId])
 					})
 					.then(([response, workspaceId]) => {
-						const loginAsDifferentUser = request(app).post('/api/sessions').send(loginZara)
+						const loginAsDifferentUser = request(app).post('/api/sessions').send(loginJake)
 						return Promise.all([loginAsDifferentUser, workspaceId])
 					})
 					.then(([response, workspaceId]) => {
@@ -753,7 +753,7 @@ describe('/api/workspaces', () => {
 					workspaceName: string
 				}
 				const login: LoginI = {
-					email: 'gabi.ramsay@example.com',
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
 				const renameWorkspace: WorkspaceI = {
@@ -788,12 +788,12 @@ describe('/api/workspaces', () => {
 				interface WorkspaceI {
 					workspaceName: string
 				}
-				const loginGabi: LoginI = {
-					email: 'gabi.ramsay@example.com',
+				const loginLisa: LoginI = {
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const loginZara: LoginI = {
-					email: 'zara.russel@example.com',
+				const loginJake: LoginI = {
+					email: 'jake.weston@example.com',
 					password: 'fddnQzxuqerp'
 				}
 				const workspace: WorkspaceI = {
@@ -801,7 +801,7 @@ describe('/api/workspaces', () => {
 				}
 				return request(app)
 					.post('/api/sessions')
-					.send(loginGabi)
+					.send(loginLisa)
 					.then((response) => {
 						const cookie = response.headers['set-cookie']
 						const postWorkspace = request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace)
@@ -813,7 +813,7 @@ describe('/api/workspaces', () => {
 						return Promise.all([logout, workspaceId])
 					})
 					.then(([response, workspaceId]) => {
-						const loginAsDifferentUser = request(app).post('/api/sessions').send(loginZara)
+						const loginAsDifferentUser = request(app).post('/api/sessions').send(loginJake)
 						return Promise.all([loginAsDifferentUser, workspaceId])
 					})
 					.then(([response, workspaceId]) => {
@@ -835,7 +835,7 @@ describe('/api/workspaces', () => {
 					workspaceName: string
 				}
 				const login: LoginI = {
-					email: 'gabi.ramsay@example.com',
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
 				const workspace: WorkspaceI = {
@@ -867,7 +867,7 @@ describe('/api/workspaces', () => {
 					workspaceName: string
 				}
 				const login: LoginI = {
-					email: 'gabi.ramsay@example.com',
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
 				const workspace: WorkspaceI = {
@@ -900,7 +900,7 @@ describe('/api/workspaces', () => {
 					password: string
 				}
 				const login: LoginI = {
-					email: 'gabi.ramsay@example.com',
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
 				const workspaceId = new ObjectId()
@@ -928,12 +928,12 @@ describe('/api/workspaces', () => {
 				interface WorkspaceI {
 					workspaceName: string
 				}
-				const loginGabi: LoginI = {
-					email: 'gabi.ramsay@example.com',
+				const loginLisa: LoginI = {
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const loginZara: LoginI = {
-					email: 'zara.russel@example.com',
+				const loginJake: LoginI = {
+					email: 'jake.weston@example.com',
 					password: 'fddnQzxuqerp'
 				}
 				const workspace: WorkspaceI = {
@@ -941,7 +941,7 @@ describe('/api/workspaces', () => {
 				}
 				return request(app)
 					.post('/api/sessions')
-					.send(loginGabi)
+					.send(loginLisa)
 					.then((response) => {
 						const cookie = response.headers['set-cookie']
 						const postWorkspace = request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace)
@@ -953,7 +953,7 @@ describe('/api/workspaces', () => {
 						return Promise.all([logout, workspaceId])
 					})
 					.then(([response, workspaceId]) => {
-						const loginAsDifferentUser = request(app).post('/api/sessions').send(loginZara)
+						const loginAsDifferentUser = request(app).post('/api/sessions').send(loginJake)
 						return Promise.all([loginAsDifferentUser, workspaceId])
 					})
 					.then(([response, workspaceId]) => {
@@ -992,7 +992,7 @@ describe('/api/workspaces', () => {
 					workspaceName: string
 				}
 				const login: LoginI = {
-					email: 'gabi.ramsay@example.com',
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
 				const workspace: WorkspaceI = {
@@ -1030,7 +1030,7 @@ describe('/api/workspaces', () => {
 					workspaceName: string
 				}
 				const login: LoginI = {
-					email: 'gabi.ramsay@example.com',
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
 				const workspace: WorkspaceI = {
@@ -1068,12 +1068,12 @@ describe('/api/workspaces', () => {
 				interface WorkspaceI {
 					workspaceName: string
 				}
-				const loginGabi: LoginI = {
-					email: 'gabi.ramsay@example.com',
+				const loginLisa: LoginI = {
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const loginZara: LoginI = {
-					email: 'zara.russel@example.com',
+				const loginJake: LoginI = {
+					email: 'jake.weston@example.com',
 					password: 'fddnQzxuqerp'
 				}
 				const workspace: WorkspaceI = {
@@ -1081,7 +1081,7 @@ describe('/api/workspaces', () => {
 				}
 				return request(app)
 					.post('/api/sessions')
-					.send(loginGabi)
+					.send(loginLisa)
 					.then((response) => {
 						const cookie = response.headers['set-cookie']
 						const postWorkspace = request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace)
@@ -1093,7 +1093,7 @@ describe('/api/workspaces', () => {
 						return Promise.all([logout, workspaceId])
 					})
 					.then(([response, workspaceId]) => {
-						const loginAsDifferentUser = request(app).post('/api/sessions').send(loginZara)
+						const loginAsDifferentUser = request(app).post('/api/sessions').send(loginJake)
 						return Promise.all([loginAsDifferentUser, workspaceId])
 					})
 					.then(([response, workspaceId]) => {
@@ -1114,7 +1114,7 @@ describe('/api/workspaces', () => {
 					password: string
 				}
 				const login: LoginI = {
-					email: 'gabi.ramsay@example.com',
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
 				const workspaceId = new ObjectId()
@@ -1142,7 +1142,7 @@ describe('/api/workspaces', () => {
 					workspaceName: string
 				}
 				const login: LoginI = {
-					email: 'gabi.ramsay@example.com',
+					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
 				const workspace: WorkspaceI = {
