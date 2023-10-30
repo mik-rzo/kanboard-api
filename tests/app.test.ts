@@ -899,15 +899,9 @@ describe('/api/workspaces', () => {
 					email: string
 					password: string
 				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
 				const login: LoginI = {
 					email: 'gabi.ramsay@example.com',
 					password: '2Vbikjlwe7wo'
-				}
-				const workspace: WorkspaceI = {
-					workspaceName: 'Agile Aces'
 				}
 				const workspaceId = new ObjectId()
 				return request(app)
