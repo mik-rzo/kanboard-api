@@ -57,8 +57,11 @@
 			]
 		}
 	},
+	"DELETE /api/workspaces/:workspace_id": {
+		"description": "deletes workspace from the database"
+	},
 	"PATCH /api/workspaces/:workspace_id/name": {
-		"description": "accepts workspace name and renames existing workspace matching ID",
+		"description": "accepts workspace name and renames an existing workspace",
 		"exampleRequest": {
 			"workspaceName": "Agile Aces"
 		},
@@ -71,7 +74,7 @@
 		}
 	},
 	"PATCH /api/workspaces/:workspace_id/users": {
-		"description": "adds logged in user ID to users array of workspace matching ID",
+		"description": "adds logged in user ID to users array of an existing workspace",
 		"exampleResponse": {
 			"workspace": {
 				"_id": "651425e797d2e1dc6efe3539",
