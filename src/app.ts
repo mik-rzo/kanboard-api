@@ -51,7 +51,7 @@ app.use('/', router)
 
 app.use((error, request, response, next) => {
 	if (error.code === 121) {
-		response.status(400).send({ message: 'Missing required information.' })
+		response.status(400).send({ message: 'Missing required information in request body.' })
 	} else {
 		next(error)
 	}

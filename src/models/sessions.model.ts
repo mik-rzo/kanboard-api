@@ -8,7 +8,7 @@ interface LoginRequestBody {
 
 export function insertSession(login: LoginRequestBody, session) {
 	if (!login.email || !login.password) {
-		return Promise.reject({ code: 400, message: 'Missing email or password.' })
+		return Promise.reject({ code: 400, message: 'Missing login details.' })
 	}
 	const { email } = login
 	return findUserByEmail(email)

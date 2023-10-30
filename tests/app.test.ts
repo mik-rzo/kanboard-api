@@ -56,7 +56,7 @@ describe('/api/users', () => {
 				.expect(400)
 				.then((response) => {
 					const { message } = response.body
-					expect(message).toBe('Missing required information.')
+					expect(message).toBe('Missing required information in request body.')
 				})
 		})
 		test('status 400 - missing email property', () => {
@@ -75,7 +75,7 @@ describe('/api/users', () => {
 				.expect(400)
 				.then((response) => {
 					const { message } = response.body
-					expect(message).toBe('Missing required information.')
+					expect(message).toBe('Missing required information in request body.')
 				})
 		})
 		test('status 400 - missing password property', () => {
@@ -94,7 +94,7 @@ describe('/api/users', () => {
 				.expect(400)
 				.then((response) => {
 					const { message } = response.body
-					expect(message).toBe('Missing required information.')
+					expect(message).toBe('Missing required information in request body.')
 				})
 		})
 		test('status 409 - email already exists in database', () => {
@@ -155,7 +155,7 @@ describe('/api/sessions', () => {
 				.expect(400)
 				.then((response) => {
 					const { message } = response.body
-					expect(message).toBe('Missing email or password.')
+					expect(message).toBe('Missing login details.')
 				})
 		})
 		test('status 400 - missing password property', () => {
@@ -172,7 +172,7 @@ describe('/api/sessions', () => {
 				.expect(400)
 				.then((response) => {
 					const { message } = response.body
-					expect(message).toBe('Missing email or password.')
+					expect(message).toBe('Missing login details.')
 				})
 		})
 		test('status 401 - invalid login credentials (email does not exist in database)', () => {
@@ -304,7 +304,7 @@ describe('/api/workspaces', () => {
 				})
 				.then((response) => {
 					const { message } = response.body
-					expect(message).toBe('Missing required information.')
+					expect(message).toBe('Missing required information in request body.')
 				})
 		})
 		test('status 401 - user is not authenticated', () => {
@@ -646,7 +646,7 @@ describe('/api/workspaces', () => {
 					})
 					.then((response) => {
 						const { message } = response.body
-						expect(message).toBe('Missing required information.')
+						expect(message).toBe('Missing required information in request body.')
 					})
 			})
 			test('status 401 - user is not authenticated', () => {
