@@ -41,7 +41,6 @@
 	},
 	"GET /api/workspaces": {
 		"description": "sends an array of logged in user's workspaces",
-		"requiredQueries": ["userid"],
 		"exampleResponse": {
 			"workspaces": [
 				{
@@ -52,7 +51,7 @@
 				{
 					"_id": "6536aa7bf27882d92a00581d",
 					"name": "Buggy Bears",
-					"users": ["64f71c09bd22c8de14b39182"]
+					"users": ["64f71c09bd22c8de14b39182", "64f71c09bd22c8de14b39181", "64f71c09bd22c8de14b39183"]
 				}
 			]
 		}

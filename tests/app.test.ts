@@ -325,7 +325,7 @@ describe('/api/workspaces', () => {
 		})
 	})
 	describe('GET request', () => {
-		test("status 200 - accepts a user ID query and responds with the user's workspaces", () => {
+		test("status 200 - responds with logged in user's workspaces", () => {
 			interface LoginI {
 				email: string
 				password: string
@@ -349,7 +349,7 @@ describe('/api/workspaces', () => {
 					return Promise.all([postWorkspace, cookie])
 				})
 				.then(([response, cookie]) => {
-					return request(app).get('/api/workspaces?userid=64f71c09bd22c8de14b39182').set('Cookie', cookie).expect(200)
+					return request(app).get('/api/workspaces').set('Cookie', cookie).expect(200)
 				})
 				.then((response) => {
 					const { workspaces } = response.body
@@ -364,27 +364,6 @@ describe('/api/workspaces', () => {
 						name: 'Buggy Bears',
 						users: ['64f71c09bd22c8de14b39182']
 					})
-				})
-		})
-		test('status 400 - missing user ID query', () => {
-			interface LoginI {
-				email: string
-				password: string
-			}
-			const login: LoginI = {
-				email: 'lisa.chen@example.com',
-				password: '2Vbikjlwe7wo'
-			}
-			return request(app)
-				.post('/api/sessions')
-				.send(login)
-				.then((response) => {
-					const cookie = response.headers['set-cookie']
-					return request(app).get('/api/workspaces').set('Cookie', cookie).expect(400)
-				})
-				.then((response) => {
-					const { message } = response.body
-					expect(message).toBe('Missing required "userid" query string parameter.')
 				})
 		})
 		test('status 401 - user is not authenticated', () => {
@@ -405,32 +384,11 @@ describe('/api/workspaces', () => {
 					return Promise.all([logout, cookie])
 				})
 				.then(([response, cookie]) => {
-					return request(app).get('/api/workspaces?userid=64f71c09bd22c8de14b39182').set('Cookie', cookie).expect(401)
+					return request(app).get('/api/workspaces').set('Cookie', cookie).expect(401)
 				})
 				.then((response) => {
 					const { message } = response.body
 					expect(message).toBe('Not logged in.')
-				})
-		})
-		test('status 403 - user ID from session does not match user ID query', () => {
-			interface LoginI {
-				email: string
-				password: string
-			}
-			const login: LoginI = {
-				email: 'lisa.chen@example.com',
-				password: '2Vbikjlwe7wo'
-			}
-			return request(app)
-				.post('/api/sessions')
-				.send(login)
-				.then((response) => {
-					const cookie = response.headers['set-cookie']
-					return request(app).get('/api/workspaces?userid=64f71c09bd22c8de14b39183').set('Cookie', cookie).expect(403)
-				})
-				.then((response) => {
-					const { message } = response.body
-					expect(message).toBe('Not logged in as user matching "userid" query parameter.')
 				})
 		})
 	})
@@ -973,7 +931,7 @@ describe('/api/workspaces', () => {
 					})
 					.then(([response, workspaceId, cookie]) => {
 						return Promise.all([
-							request(app).get('/api/workspaces?userid=64f71c09bd22c8de14b39181').set('Cookie', cookie),
+							request(app).get('/api/workspaces').set('Cookie', cookie),
 							workspaceId
 						])
 					})
