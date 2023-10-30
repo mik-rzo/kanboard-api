@@ -930,8 +930,9 @@ describe('/api/workspaces', () => {
 						])
 					})
 					.then(([response, workspaceId, cookie]) => {
+						const getUsersWorkspaces = request(app).get('/api/workspaces').set('Cookie', cookie)
 						return Promise.all([
-							request(app).get('/api/workspaces').set('Cookie', cookie),
+							getUsersWorkspaces,
 							workspaceId
 						])
 					})
