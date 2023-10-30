@@ -82,5 +82,8 @@
 				"users": ["653283ea7a4d463a1db52023", "653283ea7a4d463a1db52024"]
 			}
 		}
+	},
+	"DELETE /api/workspaces/:workspace_id/users/:user_id": {
+		"description": "removes user ID from users array of an existing workspace and deletes workspace from the database if users array becomes empty"
 	}
 }

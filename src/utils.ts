@@ -20,3 +20,7 @@ export function convertWorkspaceObjectIdsToString(workspace) {
 export function addUserToWorkspace(workspace, userId) {
 	return { ...workspace, users: [...workspace.users, userId] }
 }
+
+export function deleteUserFromWorkspace(workspace, userId) {
+	return { ...workspace, users: workspace.users.filter((userIdElement) => !userIdElement.equals(userId)) }
+}

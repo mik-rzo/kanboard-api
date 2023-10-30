@@ -1,6 +1,6 @@
 import pool from '../db/connection.js'
 import { ObjectId } from 'mongodb'
-import { convertWorkspaceObjectIdsToString, addUserToWorkspace } from '../utils.js'
+import { convertWorkspaceObjectIdsToString, addUserToWorkspace, deleteUserFromWorkspace } from '../utils.js'
 
 export function insertWorkspace(workspaceName, userId) {
 	userId = new ObjectId(userId)
@@ -71,6 +71,26 @@ export function addWorkspaceUser(workspaceId, userId) {
 		.then(([workspace, db]) => {
 			const duplicateUser: boolean = workspace.users.some((compareUserId: ObjectId) => compareUserId.equals(userId))
 			const updatedWorkspace = duplicateUser === false ? addUserToWorkspace(workspace, userId) : workspace
+			return db.collection('workspaces').updateOne({ _id: workspaceId }, { $set: { users: updatedWorkspace.users } })
+		})
+		.then(() => {
+			return findWorkspaceById(workspaceId)
+		})
+}
+
+export function removeWorkspaceUser(workspaceId, userId) {
+	workspaceId = new ObjectId(workspaceId)
+	userId = new ObjectId(userId)
+	return pool
+		.then((db) => {
+			return Promise.all([db.collection('workspaces').findOne({ _id: workspaceId }), db])
+		})
+		.then(([workspace, db]) => {
+			const userInWorkspace: boolean = workspace.users.some((compareUserId: ObjectId) => compareUserId.equals(userId))
+			if (!userInWorkspace) {
+				return Promise.reject({ code: 404, message: 'User matching ID is not part of workspace.' })
+			}
+			const updatedWorkspace = deleteUserFromWorkspace(workspace, userId)
 			return db.collection('workspaces').updateOne({ _id: workspaceId }, { $set: { users: updatedWorkspace.users } })
 		})
 		.then(() => {
