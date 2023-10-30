@@ -434,6 +434,148 @@ describe('/api/workspaces', () => {
 				})
 		})
 	})
+	describe('/:workspace_id', () => {
+		describe('DELETE request', () => {
+			test('status 204 - workspace matching ID removed from database', () => {
+				interface LoginI {
+					email: string
+					password: string
+				}
+				interface WorkspaceI {
+					workspaceName: string
+				}
+				const login: LoginI = {
+					email: 'gabi.ramsay@example.com',
+					password: '2Vbikjlwe7wo'
+				}
+				const workspace: WorkspaceI = {
+					workspaceName: 'Buggy Bears'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postWorkspace = request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace)
+						return Promise.all([postWorkspace, cookie])
+					})
+					.then(([response, cookie]) => {
+						const workspaceId = response.body.workspace._id
+						return Promise.all([
+							request(app).delete(`/api/workspaces/${workspaceId}`).set('Cookie', cookie).expect(204),
+							workspaceId,
+							cookie
+						])
+					})
+					.then(([response, workspaceId, cookie]) => {
+						return request(app).delete(`/api/workspaces/${workspaceId}`).set('Cookie', cookie).expect(404)
+					})
+			})
+			test('status 401 - user is not authenticated', () => {
+				interface LoginI {
+					email: string
+					password: string
+				}
+				interface WorkspaceI {
+					workspaceName: string
+				}
+				const login: LoginI = {
+					email: 'gabi.ramsay@example.com',
+					password: '2Vbikjlwe7wo'
+				}
+				const workspace: WorkspaceI = {
+					workspaceName: 'Buggy Bears'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postWorkspace = request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace)
+						return Promise.all([postWorkspace, cookie])
+					})
+					.then(([response, cookie]) => {
+						const workspaceId = response.body.workspace._id
+						const logout = request(app).delete('/api/sessions').set('Cookie', cookie)
+						return Promise.all([logout, workspaceId, cookie])
+					})
+					.then(([response, workspaceId, cookie]) => {
+						return request(app).delete(`/api/workspaces/${workspaceId}`).set('Cookie', cookie).expect(401)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('Not logged in.')
+					})
+			})
+			test('status 404 - could not find workspace matching ID', () => {
+				interface LoginI {
+					email: string
+					password: string
+				}
+				const login: LoginI = {
+					email: 'gabi.ramsay@example.com',
+					password: '2Vbikjlwe7wo'
+				}
+				const workspaceId = new ObjectId()
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						return request(app).delete(`/api/workspaces/${workspaceId}`).set('Cookie', cookie).expect(404)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('Workspace matching ID not found.')
+					})
+			})
+			test('status 403 - user is not authorized to delete workspace', () => {
+				interface LoginI {
+					email: string
+					password: string
+				}
+				interface WorkspaceI {
+					workspaceName: string
+				}
+				const loginGabi: LoginI = {
+					email: 'gabi.ramsay@example.com',
+					password: '2Vbikjlwe7wo'
+				}
+				const loginZara: LoginI = {
+					email: 'zara.russel@example.com',
+					password: 'fddnQzxuqerp'
+				}
+				const workspace: WorkspaceI = {
+					workspaceName: 'Buggy Bears'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(loginGabi)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postWorkspace = request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace)
+						return Promise.all([postWorkspace, cookie])
+					})
+					.then(([response, cookie]) => {
+						const workspaceId = response.body.workspace._id
+						const logout = request(app).delete('/api/sessions').set('Cookie', cookie)
+						return Promise.all([logout, workspaceId])
+					})
+					.then(([response, workspaceId]) => {
+						const loginAsDifferentUser = request(app).post('/api/sessions').send(loginZara)
+						return Promise.all([loginAsDifferentUser, workspaceId])
+					})
+					.then(([response, workspaceId]) => {
+						const cookie = response.headers['set-cookie']
+						return request(app).delete(`/api/workspaces/${workspaceId}`).set('Cookie', cookie).expect(403)
+					})
+					.then((response) => {
+						const {message} = response.body
+						expect(message).toBe('User is not part of workspace.')
+					})
+			})
+		})
+	})
 	describe('/:workspace_id/name', () => {
 		describe('PATCH request', () => {
 			test('status 200 - accepts object with workspace name and updates workspace matching ID', () => {
@@ -550,7 +692,7 @@ describe('/api/workspaces', () => {
 						expect(message).toBe('Not logged in.')
 					})
 			})
-			test('status 403 - user does not have permission to change workspace name', () => {
+			test('status 403 - user is not authorized to change workspace name', () => {
 				interface LoginI {
 					email: string
 					password: string
@@ -599,7 +741,7 @@ describe('/api/workspaces', () => {
 					})
 					.then((response) => {
 						const { message } = response.body
-						expect(message).toBe('Not authorized.')
+						expect(message).toBe('User is not part of workspace.')
 					})
 			})
 			test('status 404 - could not find workspace matching id', () => {

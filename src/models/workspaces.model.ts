@@ -31,13 +31,23 @@ export function findWorkspaceById(workspaceId) {
 export function findWorkspacesByUser(userId) {
 	return pool
 		.then((db) => {
-			return db.collection('workspaces').find({users: new ObjectId(userId)}).toArray()
+			return db
+				.collection('workspaces')
+				.find({ users: new ObjectId(userId) })
+				.toArray()
 		})
 		.then((result) => {
 			return result.map((workspace) => {
 				return convertWorkspaceObjectIdsToString(workspace)
 			})
 		})
+}
+
+export function deleteWorkspaceDocument(workspaceId) {
+	workspaceId = new ObjectId(workspaceId)
+	return pool.then((db) => {
+		return db.collection('workspaces').deleteOne({ _id: workspaceId })
+	})
 }
 
 export function updateWorkspaceName(workspaceId, workspaceName) {
@@ -80,7 +90,7 @@ export function authorization(workspaceId, userId) {
 			})
 			const authorized = users.includes(userId)
 			if (!authorized) {
-				return Promise.reject({ code: 403, message: 'Not authorized.' })
+				return Promise.reject({ code: 403, message: 'User is not part of workspace.' })
 			} else {
 				return Promise.resolve()
 			}

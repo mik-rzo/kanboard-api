@@ -25,7 +25,7 @@ export function insertSession(login: LoginRequestBody, session) {
 		})
 }
 
-export function deleteSessionDoc(session) {
+export function deleteSessionDocument(session) {
 	if (session.hasOwnProperty('authenticated') === true) {
 		return Promise.resolve(session.destroy())
 	} else {
