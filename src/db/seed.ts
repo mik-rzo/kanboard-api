@@ -35,7 +35,8 @@ export async function seed() {
 		users[i].password = await bcrypt.hash(users[i].password, 5)
 		await db.collection('workspaces').insertOne({
 			name: 'Personal',
-			users: [users[i]._id]
+			users: [users[i]._id],
+			boards: []
 		})
 	}
 	await db.collection('users').insertMany(users)

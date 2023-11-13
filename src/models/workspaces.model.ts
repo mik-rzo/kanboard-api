@@ -6,7 +6,7 @@ export function insertWorkspace(workspaceName, userId) {
 	userId = new ObjectId(userId)
 	return pool
 		.then((db) => {
-			return db.collection('workspaces').insertOne({ name: workspaceName, users: [userId] })
+			return db.collection('workspaces').insertOne({ name: workspaceName, users: [userId], boards: [] })
 		})
 		.then((result) => {
 			const workspaceId = result.insertedId

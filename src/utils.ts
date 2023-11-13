@@ -13,6 +13,9 @@ export function convertWorkspaceObjectIdsToString(workspace) {
 		name: workspace.name,
 		users: workspace.users.map((userId) => {
 			return userId.toString()
+		}),
+		boards: workspace.boards.map((boardId) => {
+			return boardId.toString()
 		})
 	}
 }

@@ -20,7 +20,8 @@ export function createUser(user) {
 			const userId = result.insertedId
 			const workspace = {
 				name: 'Personal',
-				users: [userId]
+				users: [userId],
+				boards: []
 			}
 			return Promise.all([userId, db.collection('workspaces').insertOne(workspace)])
 		})

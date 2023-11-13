@@ -66,11 +66,13 @@ describe('convertWorkspaceObjectIdsToString()', () => {
 			_id: ObjectId
 			name: string
 			users: ObjectId[]
+			boards: ObjectId[]
 		}
 		const workspace: WorkspaceI = {
 			_id: new ObjectId(),
 			name: 'Buggy Bears',
-			users: [new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId()]
+			users: [new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId()],
+			boards: [new ObjectId(), new ObjectId()]
 		}
 		const output = convertWorkspaceObjectIdsToString(workspace)
 		expect(output).toBeTypeOf('object')
@@ -82,16 +84,21 @@ describe('convertWorkspaceObjectIdsToString()', () => {
 			_id: ObjectId
 			name: string
 			users: ObjectId[]
+			boards: ObjectId[]
 		}
 		const workspace: WorkspaceI = {
 			_id: new ObjectId(),
 			name: 'Buggy Bears',
-			users: [new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId()]
+			users: [new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId()],
+			boards: [new ObjectId(), new ObjectId()]
 		}
 		const output = convertWorkspaceObjectIdsToString(workspace)
 		expect(output._id).toBeTypeOf('string')
 		output.users.forEach((userId) => {
 			expect(userId).toBeTypeOf('string')
+		})
+		output.boards.forEach((boardId) => {
+			expect(boardId).toBeTypeOf('string')
 		})
 	})
 	test('does not mutate the input', () => {
@@ -104,7 +111,8 @@ describe('convertWorkspaceObjectIdsToString()', () => {
 				new ObjectId('65200dee4d6406e7cedc7d19'),
 				new ObjectId('65200dee4d6406e7cedc7d1a'),
 				new ObjectId('65200dee4d6406e7cedc7d1b')
-			]
+			],
+			boards: [new ObjectId('65200dee4d6406e7cedc7d1c'), new ObjectId('65200dee4d6406e7cedc7d1d')]
 		}
 		const control = {
 			_id: new ObjectId('65200dee4d6406e7cedc7d16'),
@@ -115,7 +123,8 @@ describe('convertWorkspaceObjectIdsToString()', () => {
 				new ObjectId('65200dee4d6406e7cedc7d19'),
 				new ObjectId('65200dee4d6406e7cedc7d1a'),
 				new ObjectId('65200dee4d6406e7cedc7d1b')
-			]
+			],
+			boards: [new ObjectId('65200dee4d6406e7cedc7d1c'), new ObjectId('65200dee4d6406e7cedc7d1d')]
 		}
 		convertWorkspaceObjectIdsToString(input)
 		expect(input).toEqual(control)
@@ -128,11 +137,13 @@ describe('addUserToWorkspace()', () => {
 			_id: ObjectId
 			name: string
 			users: ObjectId[]
+			boards: ObjectId[]
 		}
 		const workspace: WorkspaceI = {
 			_id: new ObjectId(),
 			name: 'Buggy Bears',
-			users: [new ObjectId()]
+			users: [new ObjectId()],
+			boards: [new ObjectId()]
 		}
 		const output = addUserToWorkspace(workspace, new ObjectId())
 		expect(output).toBeTypeOf('object')
@@ -144,11 +155,13 @@ describe('addUserToWorkspace()', () => {
 			_id: ObjectId
 			name: string
 			users: ObjectId[]
+			boards: ObjectId[]
 		}
 		const workspace: WorkspaceI = {
 			_id: new ObjectId(),
 			name: 'Buggy Bears',
-			users: [new ObjectId('65325f0b1423421bfa7277a3')]
+			users: [new ObjectId('65325f0b1423421bfa7277a3')],
+			boards: [new ObjectId()]
 		}
 		const output = addUserToWorkspace(workspace, new ObjectId('65325f0b1423421bfa7277a4'))
 		expect(output.users.some((userId) => userId.equals(new ObjectId('65325f0b1423421bfa7277a4')))).toBe(true)
@@ -157,12 +170,14 @@ describe('addUserToWorkspace()', () => {
 		const input = {
 			_id: new ObjectId('65325f0b1423421bfa7277a2'),
 			name: 'Buggy Bears',
-			users: [new ObjectId('65325f0b1423421bfa7277a3')]
+			users: [new ObjectId('65325f0b1423421bfa7277a3')],
+			boards: [new ObjectId('65325f0b1423421bfa7277a4')]
 		}
 		const control = {
 			_id: new ObjectId('65325f0b1423421bfa7277a2'),
 			name: 'Buggy Bears',
-			users: [new ObjectId('65325f0b1423421bfa7277a3')]
+			users: [new ObjectId('65325f0b1423421bfa7277a3')],
+			boards: [new ObjectId('65325f0b1423421bfa7277a4')]
 		}
 		addUserToWorkspace(input, new ObjectId('65325f0b1423421bfa7277a4'))
 		expect(input).toEqual(control)
@@ -175,11 +190,13 @@ describe('deleteUserFromWorkspace()', () => {
 			_id: ObjectId
 			name: string
 			users: ObjectId[]
+			boards: ObjectId[]
 		}
 		const workspace: WorkspaceI = {
 			_id: new ObjectId(),
 			name: 'Buggy Bears',
-			users: [new ObjectId()]
+			users: [new ObjectId()],
+			boards: [new ObjectId()]
 		}
 		const output = deleteUserFromWorkspace(workspace, new ObjectId())
 		expect(output).toBeTypeOf('object')
@@ -191,11 +208,13 @@ describe('deleteUserFromWorkspace()', () => {
 			_id: ObjectId
 			name: string
 			users: ObjectId[]
+			boards: ObjectId[]
 		}
 		const workspace: WorkspaceI = {
 			_id: new ObjectId(),
 			name: 'Buggy Bears',
-			users: [new ObjectId('65325f0b1423421bfa7277a3'), new ObjectId('65325f0b1423421bfa7277b4')]
+			users: [new ObjectId('65325f0b1423421bfa7277a3'), new ObjectId('65325f0b1423421bfa7277b4')],
+			boards: [new ObjectId()]
 		}
 		const output = deleteUserFromWorkspace(workspace, new ObjectId('65325f0b1423421bfa7277b4'))
 		expect(output.users.some((userId) => userId.equals(new ObjectId('65325f0b1423421bfa7277b4')))).toBe(false)
@@ -204,12 +223,14 @@ describe('deleteUserFromWorkspace()', () => {
 		const input = {
 			_id: new ObjectId('65325f0b1423421bfa7277b1'),
 			name: 'Buggy Bears',
-			users: [new ObjectId('65325f0b1423421bfa7277a3'), new ObjectId('65325f0b1423421bfa7277b4')]
+			users: [new ObjectId('65325f0b1423421bfa7277a3'), new ObjectId('65325f0b1423421bfa7277b4')],
+			boards: [new ObjectId('65325f0b1423421bfa7277b5')]
 		}
 		const control = {
 			_id: new ObjectId('65325f0b1423421bfa7277b1'),
 			name: 'Buggy Bears',
-			users: [new ObjectId('65325f0b1423421bfa7277a3'), new ObjectId('65325f0b1423421bfa7277b4')]
+			users: [new ObjectId('65325f0b1423421bfa7277a3'), new ObjectId('65325f0b1423421bfa7277b4')],
+			boards: [new ObjectId('65325f0b1423421bfa7277b5')]
 		}
 		deleteUserFromWorkspace(input, new ObjectId('65325f0b1423421bfa7277b4'))
 		expect(input).toEqual(control)
