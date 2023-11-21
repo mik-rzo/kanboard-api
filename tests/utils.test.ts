@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import {
-	convertUserObjectIdsToString,
-	convertWorkspaceObjectIdsToString,
+	convertUserObjectIdsToStrings,
+	convertWorkspaceObjectIdsToStrings,
 	convertBoardObjectIdsToStrings,
 	addUserToWorkspace,
 	deleteUserFromWorkspace,
@@ -9,7 +9,7 @@ import {
 } from '../src/utils'
 import { ObjectId } from 'mongodb'
 
-describe('convertUserObjectIdsToString()', () => {
+describe('convertUserObjectIdsToStrings()', () => {
 	test('returns a new object', () => {
 		interface UserI {
 			_id: ObjectId
@@ -23,7 +23,7 @@ describe('convertUserObjectIdsToString()', () => {
 			email: 'michael.panong@example.com',
 			password: '$2b$10$4cw3lzkZiAcO4SrvuVjpQe/p1nH4z/6EtTob1AcWQy9o5n7CWIoRa'
 		}
-		const output = convertUserObjectIdsToString(user)
+		const output = convertUserObjectIdsToStrings(user)
 		expect(output).toBeTypeOf('object')
 		expect(Array.isArray(output)).toBe(false)
 		expect(output).not.toBe(user)
@@ -41,7 +41,7 @@ describe('convertUserObjectIdsToString()', () => {
 			email: 'michael.panong@example.com',
 			password: '$2b$10$4cw3lzkZiAcO4SrvuVjpQe/p1nH4z/6EtTob1AcWQy9o5n7CWIoRa'
 		}
-		const output = convertUserObjectIdsToString(user)
+		const output = convertUserObjectIdsToStrings(user)
 		expect(output._id).toBeTypeOf('string')
 	})
 	test('does not mutate the input', () => {
@@ -57,12 +57,12 @@ describe('convertUserObjectIdsToString()', () => {
 			email: 'michael.panong@example.com',
 			password: '$2b$10$4cw3lzkZiAcO4SrvuVjpQe/p1nH4z/6EtTob1AcWQy9o5n7CWIoRa'
 		}
-		convertUserObjectIdsToString(input)
+		convertUserObjectIdsToStrings(input)
 		expect(input).toEqual(control)
 	})
 })
 
-describe('convertWorkspaceObjectIdsToString()', () => {
+describe('convertWorkspaceObjectIdsToStrings()', () => {
 	test('returns a new object', () => {
 		interface WorkspaceI {
 			_id: ObjectId
@@ -76,7 +76,7 @@ describe('convertWorkspaceObjectIdsToString()', () => {
 			users: [new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId()],
 			boards: [new ObjectId(), new ObjectId()]
 		}
-		const output = convertWorkspaceObjectIdsToString(workspace)
+		const output = convertWorkspaceObjectIdsToStrings(workspace)
 		expect(output).toBeTypeOf('object')
 		expect(Array.isArray(output)).toBe(false)
 		expect(output).not.toBe(workspace)
@@ -94,7 +94,7 @@ describe('convertWorkspaceObjectIdsToString()', () => {
 			users: [new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId(), new ObjectId()],
 			boards: [new ObjectId(), new ObjectId()]
 		}
-		const output = convertWorkspaceObjectIdsToString(workspace)
+		const output = convertWorkspaceObjectIdsToStrings(workspace)
 		expect(output._id).toBeTypeOf('string')
 		output.users.forEach((userId) => {
 			expect(userId).toBeTypeOf('string')
@@ -128,7 +128,7 @@ describe('convertWorkspaceObjectIdsToString()', () => {
 			],
 			boards: [new ObjectId('65200dee4d6406e7cedc7d1c'), new ObjectId('65200dee4d6406e7cedc7d1d')]
 		}
-		convertWorkspaceObjectIdsToString(input)
+		convertWorkspaceObjectIdsToStrings(input)
 		expect(input).toEqual(control)
 	})
 })

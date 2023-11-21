@@ -1,4 +1,4 @@
-export function convertUserObjectIdsToString(user) {
+export function convertUserObjectIdsToStrings(user) {
 	return {
 		_id: user._id.toString(),
 		fullName: user.fullName,
@@ -7,7 +7,7 @@ export function convertUserObjectIdsToString(user) {
 	}
 }
 
-export function convertWorkspaceObjectIdsToString(workspace) {
+export function convertWorkspaceObjectIdsToStrings(workspace) {
 	return {
 		_id: workspace._id.toString(),
 		name: workspace.name,

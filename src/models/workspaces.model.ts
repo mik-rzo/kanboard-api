@@ -1,6 +1,6 @@
 import pool from '../db/connection.js'
 import { ObjectId } from 'mongodb'
-import { convertWorkspaceObjectIdsToString, addUserToWorkspace, deleteUserFromWorkspace } from '../utils.js'
+import { convertWorkspaceObjectIdsToStrings, addUserToWorkspace, deleteUserFromWorkspace } from '../utils.js'
 
 export function insertWorkspace(workspaceName, userId) {
 	userId = new ObjectId(userId)
@@ -23,7 +23,7 @@ export function findWorkspaceById(workspaceId) {
 			if (result === null) {
 				return null
 			}
-			const workspace = convertWorkspaceObjectIdsToString(result)
+			const workspace = convertWorkspaceObjectIdsToStrings(result)
 			return workspace
 		})
 }
@@ -38,7 +38,7 @@ export function findWorkspacesByUser(userId) {
 		})
 		.then((result) => {
 			return result.map((workspace) => {
-				return convertWorkspaceObjectIdsToString(workspace)
+				return convertWorkspaceObjectIdsToStrings(workspace)
 			})
 		})
 }
