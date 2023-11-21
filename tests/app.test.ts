@@ -1129,3 +1129,51 @@ describe('/api/workspaces', () => {
 		})
 	})
 })
+
+describe('/api/boards', () => {
+	describe('POST request', () => {
+		test('status 201 - accepts object with board name and workspace ID', () => {
+			interface LoginI {
+				email: string
+				password: string
+			}
+			interface BoardI {
+				boardName: string
+				workspaceId: string
+			}
+			const login: LoginI = {
+				email: 'jake.weston@example.com',
+				password: 'fddnQzxuqerp'
+			}
+			const board: BoardI = {
+				boardName: 'House of Games API',
+				workspaceId: '64f71c09bd22c8de14b39184'
+			}
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.then((response) => {
+					const cookie = response.headers['set-cookie']
+					return Promise.all([request(app).post('/api/boards').send(board).set('Cookie', cookie).expect(201), cookie])
+				})
+				.then(([response, cookie]) => {
+					const { board } = response.body
+					expect(board).toHaveProperty('_id')
+					expect(board.name).toBe('House of Games API')
+					expect(board.labels.length).toBe(0)
+					expect(board.lists.length).toBe(0)
+					const boardId = board._id
+					return Promise.all([request(app).get('/api/workspaces').set('Cookie', cookie), boardId])
+				})
+				.then(([response, boardId]) => {
+					const { workspaces } = response.body
+					expect(workspaces).toContainEqual({
+						_id: '64f71c09bd22c8de14b39184',
+						name: 'Personal',
+						boards: [boardId],
+						users: ['64f71c09bd22c8de14b39181']
+					})
+				})
+		})
+	})
+})
