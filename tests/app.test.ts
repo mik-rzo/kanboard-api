@@ -357,12 +357,14 @@ describe('/api/workspaces', () => {
 					expect(workspaces).toContainEqual({
 						_id: expect.any(String),
 						name: 'Personal',
-						users: ['64f71c09bd22c8de14b39182']
+						users: ['64f71c09bd22c8de14b39182'],
+						boards: []
 					})
 					expect(workspaces).toContainEqual({
 						_id: expect.any(String),
 						name: 'Buggy Bears',
-						users: ['64f71c09bd22c8de14b39182']
+						users: ['64f71c09bd22c8de14b39182'],
+						boards: []
 					})
 				})
 		})
@@ -931,10 +933,7 @@ describe('/api/workspaces', () => {
 					})
 					.then(([response, workspaceId, cookie]) => {
 						const getUsersWorkspaces = request(app).get('/api/workspaces').set('Cookie', cookie)
-						return Promise.all([
-							getUsersWorkspaces,
-							workspaceId
-						])
+						return Promise.all([getUsersWorkspaces, workspaceId])
 					})
 					.then(([response, workspaceId]) => {
 						const { workspaces } = response.body
