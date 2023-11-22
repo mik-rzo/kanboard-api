@@ -1,6 +1,5 @@
 import pool from '../db/connection.js'
 import { ObjectId } from 'mongodb'
-import { addWorkspaceBoard } from './workspaces.model.js'
 import { convertBoardObjectIdsToStrings } from '../utils.js'
 
 export function insertBoard(boardName, workspaceId) {
@@ -10,9 +9,6 @@ export function insertBoard(boardName, workspaceId) {
 		})
 		.then((result) => {
 			const boardId = result.insertedId
-			return Promise.all([addWorkspaceBoard(workspaceId, boardId), boardId])
-		})
-		.then(([workspace, boardId]) => {
 			return findBoardById(boardId)
 		})
 }
