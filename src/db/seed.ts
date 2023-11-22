@@ -33,9 +33,12 @@ export async function seed() {
 	const db = await pool
 	for (let i = 0; i < users.length; i++) {
 		users[i].password = await bcrypt.hash(users[i].password, 5)
+		const personalWorkspaceId = '64f71c09bd22c8de14b3918' + `${4 + i}`
 		await db.collection('workspaces').insertOne({
+			_id: new ObjectId(personalWorkspaceId),
 			name: 'Personal',
-			users: [users[i]._id]
+			users: [users[i]._id],
+			boards: []
 		})
 	}
 	await db.collection('users').insertMany(users)

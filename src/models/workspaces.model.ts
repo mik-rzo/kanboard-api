@@ -1,12 +1,12 @@
 import pool from '../db/connection.js'
 import { ObjectId } from 'mongodb'
-import { convertWorkspaceObjectIdsToString, addUserToWorkspace, deleteUserFromWorkspace } from '../utils.js'
+import { convertWorkspaceObjectIdsToStrings, addUserToWorkspace, deleteUserFromWorkspace, addBoardToWorkspace } from '../utils.js'
 
 export function insertWorkspace(workspaceName, userId) {
 	userId = new ObjectId(userId)
 	return pool
 		.then((db) => {
-			return db.collection('workspaces').insertOne({ name: workspaceName, users: [userId] })
+			return db.collection('workspaces').insertOne({ name: workspaceName, users: [userId], boards: [] })
 		})
 		.then((result) => {
 			const workspaceId = result.insertedId
@@ -23,7 +23,7 @@ export function findWorkspaceById(workspaceId) {
 			if (result === null) {
 				return null
 			}
-			const workspace = convertWorkspaceObjectIdsToString(result)
+			const workspace = convertWorkspaceObjectIdsToStrings(result)
 			return workspace
 		})
 }
@@ -38,7 +38,7 @@ export function findWorkspacesByUser(userId) {
 		})
 		.then((result) => {
 			return result.map((workspace) => {
-				return convertWorkspaceObjectIdsToString(workspace)
+				return convertWorkspaceObjectIdsToStrings(workspace)
 			})
 		})
 }
@@ -95,6 +95,22 @@ export function removeWorkspaceUser(workspaceId, userId) {
 		})
 		.then(() => {
 			return findWorkspaceById(workspaceId)
+		})
+}
+
+export function addWorkspaceBoard(workspaceId, boardId) {
+	workspaceId = new ObjectId(workspaceId)
+	boardId = new ObjectId(boardId)
+	return pool
+		.then((db) => {
+			return Promise.all([db.collection('workspaces').findOne({ _id: workspaceId }), db])
+		})
+		.then(([workspace, db]) => {
+			const updatedWorkspace = addBoardToWorkspace(workspace, boardId)
+			return db.collection('workspaces').updateOne({ _id: workspaceId }, { $set: { boards: updatedWorkspace.boards } })
+		})
+		.then(() => {
+			findWorkspaceById(workspaceId)
 		})
 }
 

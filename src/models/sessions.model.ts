@@ -1,12 +1,7 @@
 import bcrypt from 'bcrypt'
 import { findUserByEmail } from './users.model.js'
 
-interface LoginRequestBody {
-	email: string
-	password: string
-}
-
-export function insertSession(login: LoginRequestBody, session) {
+export function insertSession(login, session) {
 	if (!login.email || !login.password) {
 		return Promise.reject({ code: 400, message: 'Missing login details.' })
 	}

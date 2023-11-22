@@ -40,7 +40,7 @@ describe('/api/users', () => {
 					expect(user.password).not.toBe('M3!qBsx7Sf8Hy6')
 				})
 		})
-		test('status 400 - missing full name property', () => {
+		test('status 400 - missing full name in request body', () => {
 			interface UserI {
 				fullName?: string
 				email?: string
@@ -59,7 +59,7 @@ describe('/api/users', () => {
 					expect(message).toBe('Missing required information in request body.')
 				})
 		})
-		test('status 400 - missing email property', () => {
+		test('status 400 - missing email in request body', () => {
 			interface UserI {
 				fullName?: string
 				email?: string
@@ -78,7 +78,7 @@ describe('/api/users', () => {
 					expect(message).toBe('Missing required information in request body.')
 				})
 		})
-		test('status 400 - missing password property', () => {
+		test('status 400 - missing password in request body', () => {
 			interface UserI {
 				fullName?: string
 				email?: string
@@ -141,7 +141,7 @@ describe('/api/sessions', () => {
 					expect(/(?:sessionID)/.test(cookie)).toBe(true)
 				})
 		})
-		test('status 400 - missing email property', () => {
+		test('status 400 - missing email in request body', () => {
 			interface LoginI {
 				email?: string
 				password?: string
@@ -158,7 +158,7 @@ describe('/api/sessions', () => {
 					expect(message).toBe('Missing login details.')
 				})
 		})
-		test('status 400 - missing password property', () => {
+		test('status 400 - missing password in request body', () => {
 			interface LoginI {
 				email?: string
 				password?: string
@@ -286,7 +286,7 @@ describe('/api/workspaces', () => {
 					expect(workspace.users).toContain('64f71c09bd22c8de14b39182')
 				})
 		})
-		test('status 400 - missing workspace name property', () => {
+		test('status 400 - missing workspace name in request body', () => {
 			interface LoginI {
 				email: string
 				password: string
@@ -357,12 +357,14 @@ describe('/api/workspaces', () => {
 					expect(workspaces).toContainEqual({
 						_id: expect.any(String),
 						name: 'Personal',
-						users: ['64f71c09bd22c8de14b39182']
+						users: ['64f71c09bd22c8de14b39182'],
+						boards: []
 					})
 					expect(workspaces).toContainEqual({
 						_id: expect.any(String),
 						name: 'Buggy Bears',
-						users: ['64f71c09bd22c8de14b39182']
+						users: ['64f71c09bd22c8de14b39182'],
+						boards: []
 					})
 				})
 		})
@@ -575,7 +577,7 @@ describe('/api/workspaces', () => {
 						expect(workspace.name).toBe('Agile Aces')
 					})
 			})
-			test('status 400 - missing workspace name property', () => {
+			test('status 400 - missing workspace name in request body', () => {
 				interface LoginI {
 					email: string
 					password: string
@@ -931,10 +933,7 @@ describe('/api/workspaces', () => {
 					})
 					.then(([response, workspaceId, cookie]) => {
 						const getUsersWorkspaces = request(app).get('/api/workspaces').set('Cookie', cookie)
-						return Promise.all([
-							getUsersWorkspaces,
-							workspaceId
-						])
+						return Promise.all([getUsersWorkspaces, workspaceId])
 					})
 					.then(([response, workspaceId]) => {
 						const { workspaces } = response.body
@@ -1127,6 +1126,203 @@ describe('/api/workspaces', () => {
 						expect(message).toBe('User matching ID is not part of workspace.')
 					})
 			})
+		})
+	})
+})
+
+describe('/api/boards', () => {
+	describe('POST request', () => {
+		test('status 201 - accepts object with board name and workspace ID', () => {
+			interface LoginI {
+				email: string
+				password: string
+			}
+			interface BoardI {
+				boardName: string
+				workspaceId: string
+			}
+			const login: LoginI = {
+				email: 'jake.weston@example.com',
+				password: 'fddnQzxuqerp'
+			}
+			const board: BoardI = {
+				boardName: 'House of Games API',
+				workspaceId: '64f71c09bd22c8de14b39184'
+			}
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.then((response) => {
+					const cookie = response.headers['set-cookie']
+					return Promise.all([request(app).post('/api/boards').send(board).set('Cookie', cookie).expect(201), cookie])
+				})
+				.then(([response, cookie]) => {
+					const { board } = response.body
+					expect(board).toHaveProperty('_id')
+					expect(board.name).toBe('House of Games API')
+					expect(Array.isArray(board.labels)).toBe(true)
+					expect(board.labels.length).toBe(0)
+					expect(Array.isArray(board.lists)).toBe(true)
+					expect(board.lists.length).toBe(0)
+					const boardId = board._id
+					return Promise.all([request(app).get('/api/workspaces').set('Cookie', cookie), boardId])
+				})
+				.then(([response, boardId]) => {
+					const { workspaces } = response.body
+					expect(workspaces).toContainEqual({
+						_id: '64f71c09bd22c8de14b39184',
+						name: 'Personal',
+						boards: [boardId],
+						users: ['64f71c09bd22c8de14b39181']
+					})
+				})
+		})
+		test('status 401 - user is not authenticated', () => {
+			interface LoginI {
+				email: string
+				password: string
+			}
+			interface BoardI {
+				boardName: string
+				workspaceId: string
+			}
+			const login: LoginI = {
+				email: 'jake.weston@example.com',
+				password: 'fddnQzxuqerp'
+			}
+			const board: BoardI = {
+				boardName: 'House of Games API',
+				workspaceId: '64f71c09bd22c8de14b39184'
+			}
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.then((response) => {
+					const cookie = response.headers['set-cookie']
+					const logout = request(app).delete('/api/sessions').set('Cookie', cookie)
+					return Promise.all([logout, cookie])
+				})
+				.then(([response, cookie]) => {
+					return request(app).post('/api/boards').send(board).set('Cookie', cookie).expect(401)
+				})
+				.then((response) => {
+					const { message } = response.body
+					expect(message).toBe('Not logged in.')
+				})
+		})
+		test('status 400 - missing board name in request body', () => {
+			interface LoginI {
+				email: string
+				password: string
+			}
+			interface BoardI {
+				boardName?: string
+				workspaceId?: string
+			}
+			const login: LoginI = {
+				email: 'jake.weston@example.com',
+				password: 'fddnQzxuqerp'
+			}
+			const board: BoardI = {
+				workspaceId: '64f71c09bd22c8de14b39184'
+			}
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.then((response) => {
+					const cookie = response.headers['set-cookie']
+					return request(app).post('/api/boards').send(board).set('Cookie', cookie).expect(400)
+				})
+				.then((response) => {
+					const { message } = response.body
+					expect(message).toBe('Missing required information in request body.')
+				})
+		})
+		test('status 400 - missing workspace ID in request body', () => {
+			interface LoginI {
+				email: string
+				password: string
+			}
+			interface BoardI {
+				boardName?: string
+				workspaceId?: string
+			}
+			const login: LoginI = {
+				email: 'jake.weston@example.com',
+				password: 'fddnQzxuqerp'
+			}
+			const board: BoardI = {
+				boardName: 'House of Games API'
+			}
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.then((response) => {
+					const cookie = response.headers['set-cookie']
+					return request(app).post('/api/boards').send(board).set('Cookie', cookie).expect(400)
+				})
+				.then((response) => {
+					const { message } = response.body
+					expect(message).toBe('Missing required information in request body.')
+				})
+		})
+		test('status 403 - user is not authorized to add board to workspace matching ID', () => {
+			interface LoginI {
+				email: string
+				password: string
+			}
+			interface BoardI {
+				boardName: string
+				workspaceId: string
+			}
+			const login: LoginI = {
+				email: 'jake.weston@example.com',
+				password: 'fddnQzxuqerp'
+			}
+			const board: BoardI = {
+				boardName: 'House of Games API',
+				workspaceId: '64f71c09bd22c8de14b39185'
+			}
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.then((response) => {
+					const cookie = response.headers['set-cookie']
+					return request(app).post('/api/boards').send(board).set('Cookie', cookie).expect(403)
+				})
+				.then((response) => {
+					const { message } = response.body
+					expect(message).toBe('User is not part of workspace.')
+				})
+		})
+		test('status 404 - workspace matching ID could not be found', () => {
+			interface LoginI {
+				email: string
+				password: string
+			}
+			interface BoardI {
+				boardName: string
+				workspaceId: string
+			}
+			const login: LoginI = {
+				email: 'jake.weston@example.com',
+				password: 'fddnQzxuqerp'
+			}
+			const board: BoardI = {
+				boardName: 'House of Games API',
+				workspaceId: new ObjectId().toString()
+			}
+			return request(app)
+				.post('/api/sessions')
+				.send(login)
+				.then((response) => {
+					const cookie = response.headers['set-cookie']
+					return request(app).post('/api/boards').send(board).set('Cookie', cookie).expect(404)
+				})
+				.then((response) => {
+					const { message } = response.body
+					expect(message).toBe('Workspace matching ID not found.')
+				})
 		})
 	})
 })

@@ -1,6 +1,6 @@
 import pool from '../db/connection.js'
 import bcrypt from 'bcrypt'
-import { convertUserObjectIdsToString } from '../utils.js'
+import { convertUserObjectIdsToStrings } from '../utils.js'
 
 export function createUser(user) {
 	if (!user.password) {
@@ -20,7 +20,8 @@ export function createUser(user) {
 			const userId = result.insertedId
 			const workspace = {
 				name: 'Personal',
-				users: [userId]
+				users: [userId],
+				boards: []
 			}
 			return Promise.all([userId, db.collection('workspaces').insertOne(workspace)])
 		})
@@ -38,7 +39,7 @@ export function findUserById(userId) {
 			if (result === null) {
 				return null
 			}
-			const user = convertUserObjectIdsToString(result)
+			const user = convertUserObjectIdsToStrings(result)
 			return user
 		})
 }
@@ -52,7 +53,7 @@ export function findUserByEmail(email) {
 			if (result === null) {
 				return Promise.reject({ code: 404, message: 'Account with email not found.' })
 			}
-			const user = convertUserObjectIdsToString(result)
+			const user = convertUserObjectIdsToStrings(result)
 			return user
 		})
 }
