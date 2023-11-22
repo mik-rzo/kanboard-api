@@ -16,14 +16,15 @@ afterAll(() => {
 })
 
 describe('/api/users', () => {
+	interface PostUserRequestBody {
+		fullName: string
+		email: string
+		password: string
+	}
 	describe('POST request', () => {
+		interface PartialPostUserRequestBody extends Partial<PostUserRequestBody> {}
 		test('status 201 - accepts user object and responds with added database entry', () => {
-			interface UserI {
-				fullName: string
-				email: string
-				password: string
-			}
-			const user: UserI = {
+			const user: PostUserRequestBody = {
 				fullName: 'Michael Panong',
 				email: 'michael.panong@example.com',
 				password: 'M3!qBsx7Sf8Hy6'
@@ -41,12 +42,7 @@ describe('/api/users', () => {
 				})
 		})
 		test('status 400 - missing full name in request body', () => {
-			interface UserI {
-				fullName?: string
-				email?: string
-				password?: string
-			}
-			const user: UserI = {
+			const user: PartialPostUserRequestBody = {
 				email: 'michael.panong@example.com',
 				password: 'M3!qBsx7Sf8Hy6'
 			}
@@ -60,12 +56,7 @@ describe('/api/users', () => {
 				})
 		})
 		test('status 400 - missing email in request body', () => {
-			interface UserI {
-				fullName?: string
-				email?: string
-				password?: string
-			}
-			const user: UserI = {
+			const user: PartialPostUserRequestBody = {
 				fullName: 'Michael Panong',
 				password: 'M3!qBsx7Sf8Hy6'
 			}
@@ -79,12 +70,7 @@ describe('/api/users', () => {
 				})
 		})
 		test('status 400 - missing password in request body', () => {
-			interface UserI {
-				fullName?: string
-				email?: string
-				password?: string
-			}
-			const user: UserI = {
+			const user: PartialPostUserRequestBody = {
 				fullName: 'Michael Panong',
 				email: 'michael.panong@example.com'
 			}
@@ -98,12 +84,7 @@ describe('/api/users', () => {
 				})
 		})
 		test('status 409 - email already exists in database', () => {
-			interface UserI {
-				fullName: string
-				email: string
-				password: string
-			}
-			const user: UserI = {
+			const user: PostUserRequestBody = {
 				fullName: 'Casper Nyström',
 				email: 'casper.nystrom@example.com',
 				password: 'imfeym7q9nwj'
@@ -121,13 +102,14 @@ describe('/api/users', () => {
 })
 
 describe('/api/sessions', () => {
+	interface PostSessionRequestBody {
+		email: string
+		password: string
+	}
 	describe('POST request', () => {
+		interface PartialPostSessionRequestBody extends Partial<PostSessionRequestBody> {}
 		test('status 201 - accepts valid login details then creates a new session in database and responds with session cookie', () => {
-			interface LoginI {
-				email: string
-				password: string
-			}
-			const login: LoginI = {
+			const login: PostSessionRequestBody = {
 				email: 'casper.nystrom@example.com',
 				password: 'imfeym7q9nwj'
 			}
@@ -142,11 +124,7 @@ describe('/api/sessions', () => {
 				})
 		})
 		test('status 400 - missing email in request body', () => {
-			interface LoginI {
-				email?: string
-				password?: string
-			}
-			const login: LoginI = {
+			const login: PartialPostSessionRequestBody = {
 				password: 'imfeym7q9nwj'
 			}
 			return request(app)
@@ -159,11 +137,7 @@ describe('/api/sessions', () => {
 				})
 		})
 		test('status 400 - missing password in request body', () => {
-			interface LoginI {
-				email?: string
-				password?: string
-			}
-			const login: LoginI = {
+			const login: PartialPostSessionRequestBody = {
 				email: 'casper.nystrom@example.com'
 			}
 			return request(app)
@@ -176,11 +150,7 @@ describe('/api/sessions', () => {
 				})
 		})
 		test('status 401 - invalid login credentials (email does not exist in database)', () => {
-			interface LoginI {
-				email: string
-				password: string
-			}
-			const login: LoginI = {
+			const login: PostSessionRequestBody = {
 				email: 'michael.panong@example.com',
 				password: 'M3!qBsx7Sf8Hy6'
 			}
@@ -194,11 +164,7 @@ describe('/api/sessions', () => {
 				})
 		})
 		test('status 401 - invalid login credentials (wrong password)', () => {
-			interface LoginI {
-				email: string
-				password: string
-			}
-			const login: LoginI = {
+			const login: PostSessionRequestBody = {
 				email: 'casper.nystrom@example.com',
 				password: 'wrong-password'
 			}
@@ -214,11 +180,7 @@ describe('/api/sessions', () => {
 	})
 	describe('DELETE request', () => {
 		test("status 204 - deletes session in database if there's a valid user session", () => {
-			interface LoginI {
-				email: string
-				password: string
-			}
-			const login: LoginI = {
+			const login: PostSessionRequestBody = {
 				email: 'jake.weston@example.com',
 				password: 'fddnQzxuqerp'
 			}
@@ -256,20 +218,21 @@ describe('/api/sessions', () => {
 })
 
 describe('/api/workspaces', () => {
+	interface LoginRequestBody {
+		email: string
+		password: string
+	}
+	interface PostWorkspaceRequestBody {
+		workspaceName: string
+	}
+	interface PatchWorkspaceNameRequestBody extends PostWorkspaceRequestBody {}
 	describe('POST request', () => {
 		test('status 201 - accepts object with workspace name and responds with added database entry', () => {
-			interface LoginI {
-				email: string
-				password: string
-			}
-			interface WorkspaceI {
-				workspaceName: string
-			}
-			const login: LoginI = {
+			const login: LoginRequestBody = {
 				email: 'lisa.chen@example.com',
 				password: '2Vbikjlwe7wo'
 			}
-			const workspace: WorkspaceI = {
+			const workspace: PostWorkspaceRequestBody = {
 				workspaceName: 'Buggy Bears'
 			}
 			return request(app)
@@ -287,11 +250,7 @@ describe('/api/workspaces', () => {
 				})
 		})
 		test('status 400 - missing workspace name in request body', () => {
-			interface LoginI {
-				email: string
-				password: string
-			}
-			const login: LoginI = {
+			const login: LoginRequestBody = {
 				email: 'lisa.chen@example.com',
 				password: '2Vbikjlwe7wo'
 			}
@@ -308,16 +267,24 @@ describe('/api/workspaces', () => {
 				})
 		})
 		test('status 401 - user is not authenticated', () => {
-			interface WorkspaceI {
-				workspaceName: string
+			const login: LoginRequestBody = {
+				email: 'lisa.chen@example.com',
+				password: '2Vbikjlwe7wo'
 			}
-			const workspace: WorkspaceI = {
+			const workspace: PostWorkspaceRequestBody = {
 				workspaceName: 'Buggy Bears'
 			}
 			return request(app)
-				.post('/api/workspaces')
-				.send(workspace)
-				.expect(401)
+				.post('/api/sessions')
+				.send(login)
+				.then((response) => {
+					const cookie = response.headers['set-cookie']
+					const logout = request(app).delete('/api/sessions').set('Cookie', cookie)
+					return Promise.all([logout, cookie])
+				})
+				.then(([response, cookie]) => {
+					return request(app).post('/api/workspaces').send(workspace).set('Cookie', cookie).expect(401)
+				})
 				.then((response) => {
 					const { message } = response.body
 					expect(message).toBe('Not logged in.')
@@ -326,18 +293,11 @@ describe('/api/workspaces', () => {
 	})
 	describe('GET request', () => {
 		test("status 200 - responds with logged in user's workspaces", () => {
-			interface LoginI {
-				email: string
-				password: string
-			}
-			interface WorkspaceI {
-				workspaceName: string
-			}
-			const login: LoginI = {
+			const login: LoginRequestBody = {
 				email: 'lisa.chen@example.com',
 				password: '2Vbikjlwe7wo'
 			}
-			const workspace: WorkspaceI = {
+			const workspace: PostWorkspaceRequestBody = {
 				workspaceName: 'Buggy Bears'
 			}
 			return request(app)
@@ -369,11 +329,7 @@ describe('/api/workspaces', () => {
 				})
 		})
 		test('status 401 - user is not authenticated', () => {
-			interface LoginI {
-				email: string
-				password: string
-			}
-			const login: LoginI = {
+			const login: LoginRequestBody = {
 				email: 'lisa.chen@example.com',
 				password: '2Vbikjlwe7wo'
 			}
@@ -397,18 +353,11 @@ describe('/api/workspaces', () => {
 	describe('/:workspace_id', () => {
 		describe('DELETE request', () => {
 			test('status 204 - workspace matching ID removed from database', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
-				const login: LoginI = {
+				const login: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const workspace: WorkspaceI = {
+				const workspace: PostWorkspaceRequestBody = {
 					workspaceName: 'Buggy Bears'
 				}
 				return request(app)
@@ -432,18 +381,11 @@ describe('/api/workspaces', () => {
 					})
 			})
 			test('status 401 - user is not authenticated', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
-				const login: LoginI = {
+				const login: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const workspace: WorkspaceI = {
+				const workspace: PostWorkspaceRequestBody = {
 					workspaceName: 'Buggy Bears'
 				}
 				return request(app)
@@ -468,11 +410,7 @@ describe('/api/workspaces', () => {
 					})
 			})
 			test('status 404 - could not find workspace matching ID', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				const login: LoginI = {
+				const login: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
@@ -490,22 +428,15 @@ describe('/api/workspaces', () => {
 					})
 			})
 			test('status 403 - user is not authorized to delete workspace', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
-				const loginLisa: LoginI = {
+				const loginLisa: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const loginJake: LoginI = {
+				const loginJake: LoginRequestBody = {
 					email: 'jake.weston@example.com',
 					password: 'fddnQzxuqerp'
 				}
-				const workspace: WorkspaceI = {
+				const workspace: PostWorkspaceRequestBody = {
 					workspaceName: 'Buggy Bears'
 				}
 				return request(app)
@@ -539,21 +470,14 @@ describe('/api/workspaces', () => {
 	describe('/:workspace_id/name', () => {
 		describe('PATCH request', () => {
 			test('status 200 - accepts object with workspace name and updates workspace matching ID', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
-				const login: LoginI = {
+				const login: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const workspace: WorkspaceI = {
+				const workspace: PostWorkspaceRequestBody = {
 					workspaceName: 'Buggy Bears'
 				}
-				const renameWorkspace: WorkspaceI = {
+				const renameWorkspace: PatchWorkspaceNameRequestBody = {
 					workspaceName: 'Agile Aces'
 				}
 				return request(app)
@@ -578,18 +502,11 @@ describe('/api/workspaces', () => {
 					})
 			})
 			test('status 400 - missing workspace name in request body', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
-				const login: LoginI = {
+				const login: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const workspace: WorkspaceI = {
+				const workspace: PostWorkspaceRequestBody = {
 					workspaceName: 'Buggy Bears'
 				}
 				return request(app)
@@ -610,21 +527,14 @@ describe('/api/workspaces', () => {
 					})
 			})
 			test('status 401 - user is not authenticated', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
-				const login: LoginI = {
+				const login: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const workspace: WorkspaceI = {
+				const workspace: PostWorkspaceRequestBody = {
 					workspaceName: 'Buggy Bears'
 				}
-				const renameWorkspace: WorkspaceI = {
+				const renameWorkspace: PatchWorkspaceNameRequestBody = {
 					workspaceName: 'Agile Aces'
 				}
 				return request(app)
@@ -653,25 +563,18 @@ describe('/api/workspaces', () => {
 					})
 			})
 			test('status 403 - user is not authorized to change workspace name', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
-				const loginLisa: LoginI = {
+				const loginLisa: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const loginJake: LoginI = {
+				const loginJake: LoginRequestBody = {
 					email: 'jake.weston@example.com',
 					password: 'fddnQzxuqerp'
 				}
-				const workspace: WorkspaceI = {
+				const workspace: PostWorkspaceRequestBody = {
 					workspaceName: 'Buggy Bears'
 				}
-				const renameWorkspace: WorkspaceI = {
+				const renameWorkspace: PatchWorkspaceNameRequestBody = {
 					workspaceName: 'Agile Aces'
 				}
 				return request(app)
@@ -705,18 +608,11 @@ describe('/api/workspaces', () => {
 					})
 			})
 			test('status 404 - could not find workspace matching id', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
-				const login: LoginI = {
+				const login: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const renameWorkspace: WorkspaceI = {
+				const renameWorkspace: PatchWorkspaceNameRequestBody = {
 					workspaceName: 'Agile Aces'
 				}
 				const workspaceId = new ObjectId()
@@ -741,22 +637,15 @@ describe('/api/workspaces', () => {
 	describe('/:workspace_id/users', () => {
 		describe('PATCH request', () => {
 			test('status 200 - adds user ID from session to users array of workspace matching workspace ID', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
-				const loginLisa: LoginI = {
+				const loginLisa: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const loginJake: LoginI = {
+				const loginJake: LoginRequestBody = {
 					email: 'jake.weston@example.com',
 					password: 'fddnQzxuqerp'
 				}
-				const workspace: WorkspaceI = {
+				const workspace: PostWorkspaceRequestBody = {
 					workspaceName: 'Agile Aces'
 				}
 				return request(app)
@@ -787,18 +676,11 @@ describe('/api/workspaces', () => {
 					})
 			})
 			test('status 200 - does not add duplicate user ID', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
-				const login: LoginI = {
+				const login: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const workspace: WorkspaceI = {
+				const workspace: PostWorkspaceRequestBody = {
 					workspaceName: 'Agile Aces'
 				}
 				return request(app)
@@ -819,18 +701,11 @@ describe('/api/workspaces', () => {
 					})
 			})
 			test('status 401 - user is not authenticated', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
-				const login: LoginI = {
+				const login: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const workspace: WorkspaceI = {
+				const workspace: PostWorkspaceRequestBody = {
 					workspaceName: 'Agile Aces'
 				}
 				return request(app)
@@ -855,11 +730,7 @@ describe('/api/workspaces', () => {
 					})
 			})
 			test('status 404 - could not find workspace matching ID', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				const login: LoginI = {
+				const login: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
@@ -881,22 +752,15 @@ describe('/api/workspaces', () => {
 	describe('/:workspace_id/users/:user_id', () => {
 		describe('DELETE request', () => {
 			test('status 204 - user ID removed from users array of workspace matching workspace ID', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
-				const loginLisa: LoginI = {
+				const loginLisa: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const loginJake: LoginI = {
+				const loginJake: LoginRequestBody = {
 					email: 'jake.weston@example.com',
 					password: 'fddnQzxuqerp'
 				}
-				const workspace: WorkspaceI = {
+				const workspace: PostWorkspaceRequestBody = {
 					workspaceName: 'Agile Aces'
 				}
 				return request(app)
@@ -942,18 +806,11 @@ describe('/api/workspaces', () => {
 					})
 			})
 			test('status 204 - workspace is deleted if the last user from users array is removed', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
-				const login: LoginI = {
+				const login: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const workspace: WorkspaceI = {
+				const workspace: PostWorkspaceRequestBody = {
 					workspaceName: 'Agile Aces'
 				}
 				return request(app)
@@ -980,18 +837,11 @@ describe('/api/workspaces', () => {
 					})
 			})
 			test('status 401 - user is not authenticated', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
-				const login: LoginI = {
+				const login: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const workspace: WorkspaceI = {
+				const workspace: PostWorkspaceRequestBody = {
 					workspaceName: 'Agile Aces'
 				}
 				return request(app)
@@ -1019,22 +869,15 @@ describe('/api/workspaces', () => {
 					})
 			})
 			test('status 403 - user is not authorized to remove a user from the workspace', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
-				const loginLisa: LoginI = {
+				const loginLisa: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const loginJake: LoginI = {
+				const loginJake: LoginRequestBody = {
 					email: 'jake.weston@example.com',
 					password: 'fddnQzxuqerp'
 				}
-				const workspace: WorkspaceI = {
+				const workspace: PostWorkspaceRequestBody = {
 					workspaceName: 'Agile Aces'
 				}
 				return request(app)
@@ -1067,11 +910,7 @@ describe('/api/workspaces', () => {
 					})
 			})
 			test('status 404 - workspace matching ID could not be found', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				const login: LoginI = {
+				const login: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
@@ -1092,18 +931,11 @@ describe('/api/workspaces', () => {
 					})
 			})
 			test('status 404 - workspace does not contain user matching user ID', () => {
-				interface LoginI {
-					email: string
-					password: string
-				}
-				interface WorkspaceI {
-					workspaceName: string
-				}
-				const login: LoginI = {
+				const login: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
 					password: '2Vbikjlwe7wo'
 				}
-				const workspace: WorkspaceI = {
+				const workspace: PostWorkspaceRequestBody = {
 					workspaceName: 'Agile Aces'
 				}
 				return request(app)
@@ -1131,21 +963,23 @@ describe('/api/workspaces', () => {
 })
 
 describe('/api/boards', () => {
+	interface LoginRequestBody {
+		email: string
+		password: string
+	}
+	interface PostBoardRequestBody {
+		boardName: string
+		workspaceId: string
+	}
 	describe('POST request', () => {
+		interface PartialPostBoardRequestBody extends Partial<PostBoardRequestBody> {
+		}
 		test('status 201 - accepts object with board name and workspace ID', () => {
-			interface LoginI {
-				email: string
-				password: string
-			}
-			interface BoardI {
-				boardName: string
-				workspaceId: string
-			}
-			const login: LoginI = {
+			const login: LoginRequestBody = {
 				email: 'jake.weston@example.com',
 				password: 'fddnQzxuqerp'
 			}
-			const board: BoardI = {
+			const board: PostBoardRequestBody = {
 				boardName: 'House of Games API',
 				workspaceId: '64f71c09bd22c8de14b39184'
 			}
@@ -1178,19 +1012,11 @@ describe('/api/boards', () => {
 				})
 		})
 		test('status 401 - user is not authenticated', () => {
-			interface LoginI {
-				email: string
-				password: string
-			}
-			interface BoardI {
-				boardName: string
-				workspaceId: string
-			}
-			const login: LoginI = {
+			const login: LoginRequestBody = {
 				email: 'jake.weston@example.com',
 				password: 'fddnQzxuqerp'
 			}
-			const board: BoardI = {
+			const board: PostBoardRequestBody = {
 				boardName: 'House of Games API',
 				workspaceId: '64f71c09bd22c8de14b39184'
 			}
@@ -1211,19 +1037,11 @@ describe('/api/boards', () => {
 				})
 		})
 		test('status 400 - missing board name in request body', () => {
-			interface LoginI {
-				email: string
-				password: string
-			}
-			interface BoardI {
-				boardName?: string
-				workspaceId?: string
-			}
-			const login: LoginI = {
+			const login: LoginRequestBody = {
 				email: 'jake.weston@example.com',
 				password: 'fddnQzxuqerp'
 			}
-			const board: BoardI = {
+			const board: PartialPostBoardRequestBody = {
 				workspaceId: '64f71c09bd22c8de14b39184'
 			}
 			return request(app)
@@ -1239,19 +1057,11 @@ describe('/api/boards', () => {
 				})
 		})
 		test('status 400 - missing workspace ID in request body', () => {
-			interface LoginI {
-				email: string
-				password: string
-			}
-			interface BoardI {
-				boardName?: string
-				workspaceId?: string
-			}
-			const login: LoginI = {
+			const login: LoginRequestBody = {
 				email: 'jake.weston@example.com',
 				password: 'fddnQzxuqerp'
 			}
-			const board: BoardI = {
+			const board: PartialPostBoardRequestBody = {
 				boardName: 'House of Games API'
 			}
 			return request(app)
@@ -1267,19 +1077,11 @@ describe('/api/boards', () => {
 				})
 		})
 		test('status 403 - user is not authorized to add board to workspace matching ID', () => {
-			interface LoginI {
-				email: string
-				password: string
-			}
-			interface BoardI {
-				boardName: string
-				workspaceId: string
-			}
-			const login: LoginI = {
+			const login: LoginRequestBody = {
 				email: 'jake.weston@example.com',
 				password: 'fddnQzxuqerp'
 			}
-			const board: BoardI = {
+			const board: PostBoardRequestBody = {
 				boardName: 'House of Games API',
 				workspaceId: '64f71c09bd22c8de14b39185'
 			}
@@ -1296,19 +1098,11 @@ describe('/api/boards', () => {
 				})
 		})
 		test('status 404 - workspace matching ID could not be found', () => {
-			interface LoginI {
-				email: string
-				password: string
-			}
-			interface BoardI {
-				boardName: string
-				workspaceId: string
-			}
-			const login: LoginI = {
+			const login: LoginRequestBody = {
 				email: 'jake.weston@example.com',
 				password: 'fddnQzxuqerp'
 			}
-			const board: BoardI = {
+			const board: PostBoardRequestBody = {
 				boardName: 'House of Games API',
 				workspaceId: new ObjectId().toString()
 			}
