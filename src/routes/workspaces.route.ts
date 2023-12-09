@@ -4,7 +4,7 @@ import {
 	getUsersWorkspaces,
 	deleteWorkspace,
 	patchWorkspaceName,
-	patchWorkspaceUsers,
+	postWorkspaceUser,
 	deleteWorkspaceUser
 } from '../controllers/workspaces.controller.js'
 import { authentication } from '../authentication.js'
@@ -18,7 +18,7 @@ workspacesRouter
 	.patch(authentication, patchWorkspaceName)
 	.delete(authentication, deleteWorkspace)
 
-workspacesRouter.route('/:workspace_id/users').patch(authentication, patchWorkspaceUsers)
+workspacesRouter.route('/:workspace_id/users').post(authentication, postWorkspaceUser)
 
 workspacesRouter.route('/:workspace_id/users/:user_id').delete(authentication, deleteWorkspaceUser)
 

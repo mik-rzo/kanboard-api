@@ -676,7 +676,7 @@ describe('/api/workspaces', () => {
 		})
 	})
 	describe('/:workspace_id/users', () => {
-		describe('PATCH request', () => {
+		describe('POST request', () => {
 			test('status 200 - adds user ID from session to users array of workspace matching workspace ID', () => {
 				const loginLisa: LoginRequestBody = {
 					email: 'lisa.chen@example.com',
@@ -708,7 +708,7 @@ describe('/api/workspaces', () => {
 					})
 					.then(([response, workspaceId]) => {
 						const cookie = response.headers['set-cookie']
-						return request(app).patch(`/api/workspaces/${workspaceId}/users`).set('Cookie', cookie).expect(200)
+						return request(app).post(`/api/workspaces/${workspaceId}/users`).set('Cookie', cookie).expect(200)
 					})
 					.then((response) => {
 						const { workspace } = response.body
@@ -734,7 +734,7 @@ describe('/api/workspaces', () => {
 					})
 					.then(([response, cookie]) => {
 						const workspaceId = response.body.workspace._id
-						return request(app).patch(`/api/workspaces/${workspaceId}/users`).set('Cookie', cookie).expect(200)
+						return request(app).post(`/api/workspaces/${workspaceId}/users`).set('Cookie', cookie).expect(200)
 					})
 					.then((response) => {
 						const { workspace } = response.body
@@ -763,7 +763,7 @@ describe('/api/workspaces', () => {
 						return Promise.all([logout, workspaceId, cookie])
 					})
 					.then(([response, workspaceId, cookie]) => {
-						return request(app).patch(`/api/workspaces/${workspaceId}/users`).set('Cookie', cookie).expect(401)
+						return request(app).post(`/api/workspaces/${workspaceId}/users`).set('Cookie', cookie).expect(401)
 					})
 					.then((response) => {
 						const { message } = response.body
@@ -781,7 +781,7 @@ describe('/api/workspaces', () => {
 					.send(login)
 					.then((response) => {
 						const cookie = response.headers['set-cookie']
-						return request(app).patch(`/api/workspaces/${workspaceId}/users`).set('Cookie', cookie).expect(404)
+						return request(app).post(`/api/workspaces/${workspaceId}/users`).set('Cookie', cookie).expect(404)
 					})
 					.then((response) => {
 						const { message } = response.body
@@ -823,7 +823,7 @@ describe('/api/workspaces', () => {
 					})
 					.then(([response, workspaceId]) => {
 						const cookie = response.headers['set-cookie']
-						const addUserToWorkspace = request(app).patch(`/api/workspaces/${workspaceId}/users`).set('Cookie', cookie)
+						const addUserToWorkspace = request(app).post(`/api/workspaces/${workspaceId}/users`).set('Cookie', cookie)
 						return Promise.all([addUserToWorkspace, workspaceId, cookie])
 					})
 					.then(([response, workspaceId, cookie]) => {

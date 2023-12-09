@@ -76,7 +76,7 @@ export function patchWorkspaceName(request, response, next) {
 		})
 }
 
-export function patchWorkspaceUsers(request, response, next) {
+export function postWorkspaceUser(request, response, next) {
 	const authenticatedUserId = request.session.authenticated
 	const { workspace_id } = request.params
 	return findWorkspaceById(new ObjectId(workspace_id))
