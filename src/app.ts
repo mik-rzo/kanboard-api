@@ -8,7 +8,14 @@ const MongoDBStore = MongoStore(session)
 
 const app = express()
 
-app.use(express.json())
+app.use((request, response, next) => {
+	if (request.method === 'PATCH') {
+		request.headers['content-type'] = 'application/merge-patch+json'
+	}
+	next()
+})
+
+app.use(express.json({ type: ['application/json', 'application/merge-patch+json'] }))
 
 dotenv.config({ path: new URL(`../../.env.${app.get('env')}`, import.meta.url) })
 

@@ -225,7 +225,9 @@ describe('/api/workspaces', () => {
 	interface PostWorkspaceRequestBody {
 		workspaceName: string
 	}
-	interface PatchWorkspaceNameRequestBody extends PostWorkspaceRequestBody {}
+	interface PatchWorkspaceNameRequestBody {
+		name: string
+	}
 	describe('POST request', () => {
 		test('status 201 - accepts object with workspace name and responds with added database entry', () => {
 			const login: LoginRequestBody = {
@@ -466,8 +468,6 @@ describe('/api/workspaces', () => {
 					})
 			})
 		})
-	})
-	describe('/:workspace_id/name', () => {
 		describe('PATCH request', () => {
 			test('status 200 - accepts object with workspace name and updates workspace matching ID', () => {
 				const login: LoginRequestBody = {
@@ -478,7 +478,7 @@ describe('/api/workspaces', () => {
 					workspaceName: 'Buggy Bears'
 				}
 				const renameWorkspace: PatchWorkspaceNameRequestBody = {
-					workspaceName: 'Agile Aces'
+					name: 'Agile Aces'
 				}
 				return request(app)
 					.post('/api/sessions')
@@ -491,7 +491,7 @@ describe('/api/workspaces', () => {
 					.then(([response, cookie]) => {
 						const workspaceId = response.body.workspace._id
 						return request(app)
-							.patch(`/api/workspaces/${workspaceId}/name`)
+							.patch(`/api/workspaces/${workspaceId}`)
 							.set('Cookie', cookie)
 							.send(renameWorkspace)
 							.expect(200)
@@ -499,6 +499,47 @@ describe('/api/workspaces', () => {
 					.then((response) => {
 						const { workspace } = response.body
 						expect(workspace.name).toBe('Agile Aces')
+					})
+			})
+			test('status 200 - ignores additional properties apart from "name"', () => {
+				interface PatchWorkspaceRequestBody extends PatchWorkspaceNameRequestBody {
+					_id?: string | null
+					users?: string[] | null
+					boards?: string[] | null
+				}
+				const login: LoginRequestBody = {
+					email: 'lisa.chen@example.com',
+					password: '2Vbikjlwe7wo'
+				}
+				const workspace: PostWorkspaceRequestBody = {
+					workspaceName: 'Buggy Bears'
+				}
+				const patchWorkspace: PatchWorkspaceRequestBody = {
+					_id: null,
+					name: 'Agile Aces',
+					boards: [new ObjectId().toString(), new ObjectId().toString()]
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postWorkspace = request(app).post('/api/workspaces').set('Cookie', cookie).send(workspace)
+						return Promise.all([postWorkspace, cookie])
+					})
+					.then(([response, cookie]) => {
+						const workspaceId = response.body.workspace._id
+						return request(app)
+							.patch(`/api/workspaces/${workspaceId}`)
+							.set('Cookie', cookie)
+							.send(patchWorkspace)
+							.expect(200)
+					})
+					.then((response) => {
+						const { workspace } = response.body
+						expect(workspace).toHaveProperty('_id')
+						expect(workspace.name).toBe('Agile Aces')
+						expect(workspace.boards.length).toBe(0)
 					})
 			})
 			test('status 400 - missing workspace name in request body', () => {
@@ -519,7 +560,7 @@ describe('/api/workspaces', () => {
 					})
 					.then(([response, cookie]) => {
 						const workspaceId = response.body.workspace._id
-						return request(app).patch(`/api/workspaces/${workspaceId}/name`).set('Cookie', cookie).send({}).expect(400)
+						return request(app).patch(`/api/workspaces/${workspaceId}`).set('Cookie', cookie).send({}).expect(400)
 					})
 					.then((response) => {
 						const { message } = response.body
@@ -535,7 +576,7 @@ describe('/api/workspaces', () => {
 					workspaceName: 'Buggy Bears'
 				}
 				const renameWorkspace: PatchWorkspaceNameRequestBody = {
-					workspaceName: 'Agile Aces'
+					name: 'Agile Aces'
 				}
 				return request(app)
 					.post('/api/sessions')
@@ -552,7 +593,7 @@ describe('/api/workspaces', () => {
 					})
 					.then(([response, workspaceId, cookie]) => {
 						return request(app)
-							.patch(`/api/workspaces/${workspaceId}/name`)
+							.patch(`/api/workspaces/${workspaceId}`)
 							.set('Cookie', cookie)
 							.send(renameWorkspace)
 							.expect(401)
@@ -575,7 +616,7 @@ describe('/api/workspaces', () => {
 					workspaceName: 'Buggy Bears'
 				}
 				const renameWorkspace: PatchWorkspaceNameRequestBody = {
-					workspaceName: 'Agile Aces'
+					name: 'Agile Aces'
 				}
 				return request(app)
 					.post('/api/sessions')
@@ -597,7 +638,7 @@ describe('/api/workspaces', () => {
 					.then(([response, workspaceId]) => {
 						const cookie = response.headers['set-cookie']
 						return request(app)
-							.patch(`/api/workspaces/${workspaceId}/name`)
+							.patch(`/api/workspaces/${workspaceId}`)
 							.set('Cookie', cookie)
 							.send(renameWorkspace)
 							.expect(403)
@@ -613,7 +654,7 @@ describe('/api/workspaces', () => {
 					password: '2Vbikjlwe7wo'
 				}
 				const renameWorkspace: PatchWorkspaceNameRequestBody = {
-					workspaceName: 'Agile Aces'
+					name: 'Agile Aces'
 				}
 				const workspaceId = new ObjectId()
 				return request(app)
@@ -622,7 +663,7 @@ describe('/api/workspaces', () => {
 					.then((response) => {
 						const cookie = response.headers['set-cookie']
 						return request(app)
-							.patch(`/api/workspaces/${workspaceId}/name`)
+							.patch(`/api/workspaces/${workspaceId}`)
 							.set('Cookie', cookie)
 							.send(renameWorkspace)
 							.expect(404)
@@ -972,8 +1013,7 @@ describe('/api/boards', () => {
 		workspaceId: string
 	}
 	describe('POST request', () => {
-		interface PartialPostBoardRequestBody extends Partial<PostBoardRequestBody> {
-		}
+		interface PartialPostBoardRequestBody extends Partial<PostBoardRequestBody> {}
 		test('status 201 - accepts object with board name and workspace ID', () => {
 			const login: LoginRequestBody = {
 				email: 'jake.weston@example.com',

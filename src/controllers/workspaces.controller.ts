@@ -56,7 +56,7 @@ export function deleteWorkspace(request, response, next) {
 
 export function patchWorkspaceName(request, response, next) {
 	const authenticatedUserId = request.session.authenticated
-	const { workspaceName } = request.body
+	const { name } = request.body
 	const { workspace_id } = request.params
 	return findWorkspaceById(new ObjectId(workspace_id))
 		.then((workspace) => {
@@ -66,7 +66,7 @@ export function patchWorkspaceName(request, response, next) {
 			return authorization(workspace_id, authenticatedUserId)
 		})
 		.then(() => {
-			return updateWorkspaceName(workspace_id, workspaceName)
+			return updateWorkspaceName(workspace_id, name)
 		})
 		.then((workspace) => {
 			response.status(200).send({ workspace: workspace })
