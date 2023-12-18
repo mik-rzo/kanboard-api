@@ -319,14 +319,12 @@ describe('/api/workspaces', () => {
 					expect(workspaces).toContainEqual({
 						_id: expect.any(String),
 						name: 'Personal',
-						users: ['64f71c09bd22c8de14b39182'],
-						boards: []
+						users: ['64f71c09bd22c8de14b39182']
 					})
 					expect(workspaces).toContainEqual({
 						_id: expect.any(String),
 						name: 'Buggy Bears',
-						users: ['64f71c09bd22c8de14b39182'],
-						boards: []
+						users: ['64f71c09bd22c8de14b39182']
 					})
 				})
 		})
@@ -517,7 +515,7 @@ describe('/api/workspaces', () => {
 				const patchWorkspace: PatchWorkspaceRequestBody = {
 					_id: null,
 					name: 'Agile Aces',
-					boards: [new ObjectId().toString(), new ObjectId().toString()]
+					users: [new ObjectId().toString(), new ObjectId().toString()]
 				}
 				return request(app)
 					.post('/api/sessions')
@@ -539,7 +537,8 @@ describe('/api/workspaces', () => {
 						const { workspace } = response.body
 						expect(workspace).toHaveProperty('_id')
 						expect(workspace.name).toBe('Agile Aces')
-						expect(workspace.boards.length).toBe(0)
+						expect(workspace.users.length).toBe(1)
+						expect(workspace.users).toContain('64f71c09bd22c8de14b39182')
 					})
 			})
 			test('status 400 - missing workspace name in request body', () => {
@@ -1034,21 +1033,11 @@ describe('/api/boards', () => {
 					const { board } = response.body
 					expect(board).toHaveProperty('_id')
 					expect(board.name).toBe('House of Games API')
+					expect(board.workspace).toBe('64f71c09bd22c8de14b39184')
 					expect(Array.isArray(board.labels)).toBe(true)
 					expect(board.labels.length).toBe(0)
 					expect(Array.isArray(board.lists)).toBe(true)
 					expect(board.lists.length).toBe(0)
-					const boardId = board._id
-					return Promise.all([request(app).get('/api/workspaces').set('Cookie', cookie), boardId])
-				})
-				.then(([response, boardId]) => {
-					const { workspaces } = response.body
-					expect(workspaces).toContainEqual({
-						_id: '64f71c09bd22c8de14b39184',
-						name: 'Personal',
-						boards: [boardId],
-						users: ['64f71c09bd22c8de14b39181']
-					})
 				})
 		})
 		test('status 401 - user is not authenticated', () => {

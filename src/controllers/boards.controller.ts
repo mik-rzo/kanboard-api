@@ -1,5 +1,5 @@
 import { insertBoard } from '../models/boards.model.js'
-import { findWorkspaceById, authorization, addWorkspaceBoard } from '../models/workspaces.model.js'
+import { findWorkspaceById, authorization } from '../models/workspaces.model.js'
 import { ObjectId } from 'mongodb'
 
 export function postBoard(request, response, next) {
@@ -19,10 +19,6 @@ export function postBoard(request, response, next) {
 			return insertBoard(boardName, workspaceId)
 		})
 		.then((board) => {
-			const boardId = board._id
-			return Promise.all([addWorkspaceBoard(workspaceId, boardId), board])
-		})
-		.then(([workspace, board]) => {
 			response.status(201).send({ board: board })
 		})
 		.catch((error) => {

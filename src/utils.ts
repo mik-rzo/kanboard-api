@@ -13,9 +13,6 @@ export function convertWorkspaceObjectIdsToStrings(workspace) {
 		name: workspace.name,
 		users: workspace.users.map((userId) => {
 			return userId.toString()
-		}),
-		boards: workspace.boards.map((boardId) => {
-			return boardId.toString()
 		})
 	}
 }
@@ -24,6 +21,7 @@ export function convertBoardObjectIdsToStrings(board) {
 	return {
 		_id: board._id.toString(),
 		name: board.name,
+		workspace: board.workspace.toString(),
 		labels: board.labels.map((label) => {
 			return { ...label, _id: label._id.toString() }
 		}),
@@ -54,8 +52,4 @@ export function addUserToWorkspace(workspace, userId) {
 
 export function deleteUserFromWorkspace(workspace, userId) {
 	return { ...workspace, users: workspace.users.filter((userIdElement) => !userIdElement.equals(userId)) }
-}
-
-export function addBoardToWorkspace(workspace, boardId) {
-	return { ...workspace, boards: [...workspace.boards, boardId] }
 }

@@ -3,9 +3,10 @@ import { ObjectId } from 'mongodb'
 import { convertBoardObjectIdsToStrings } from '../utils.js'
 
 export function insertBoard(boardName, workspaceId) {
+	workspaceId = new ObjectId(workspaceId)
 	return pool
 		.then((db) => {
-			return db.collection('boards').insertOne({ name: boardName, labels: [], lists: [] })
+			return db.collection('boards').insertOne({ name: boardName, workspace: workspaceId, labels: [], lists: [] })
 		})
 		.then((result) => {
 			const boardId = result.insertedId
