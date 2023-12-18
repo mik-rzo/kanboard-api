@@ -35,21 +35,13 @@ export async function setup() {
 			$jsonSchema: {
 				bsonType: 'object',
 				title: 'Workspace Object Validation',
-				required: ['name', 'users', 'boards'],
+				required: ['name', 'users'],
 				properties: {
 					name: {
 						bsonType: 'string',
 						description: 'must be a string and is required'
 					},
 					users: {
-						bsonType: 'array',
-						description: 'must be an array and is required',
-						items: {
-							bsonType: 'objectId',
-							description: 'must be an objectId'
-						}
-					},
-					boards: {
 						bsonType: 'array',
 						description: 'must be an array and is required',
 						items: {
@@ -66,11 +58,15 @@ export async function setup() {
 			$jsonSchema: {
 				bsonType: 'object',
 				title: 'Board Object Validation',
-				required: ['name', 'labels', 'lists'],
+				required: ['name', 'workspace', 'labels', 'lists'],
 				properties: {
 					name: {
 						bsonType: 'string',
 						description: 'must be a string and is required'
+					},
+					workspace: {
+						bsonType: 'objectId',
+						description: 'must be an objectId'
 					},
 					labels: {
 						bsonType: 'array',
