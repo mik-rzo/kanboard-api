@@ -6,7 +6,6 @@ export function createUser(user) {
 	if (!user.password) {
 		return Promise.reject({ code: 121 }) // same error code thrown by Mongo driver when user document fails schema validation
 	}
-
 	return bcrypt
 		.hash(user.password, 10)
 		.then((hash: string) => {
