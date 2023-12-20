@@ -11,8 +11,7 @@
 				"_id": "64f71c09bd22c8de14b39180",
 				"fullName": "Michael Panong",
 				"email": "michael.panong@example.com",
-				"password": "$2b$10$4cw3lzkZiAcO4SrvuVjpQe/p1nH4z/6EtTob1AcWQy9o5n7CWIoRa",
-				"workspaces": ["650891add033299273ee36db"]
+				"password": "$2b$10$4cw3lzkZiAcO4SrvuVjpQe/p1nH4z/6EtTob1AcWQy9o5n7CWIoRa"
 			}
 		}
 	},
@@ -59,10 +58,10 @@
 	"DELETE /api/workspaces/:workspace_id": {
 		"description": "deletes workspace from the database"
 	},
-	"PATCH /api/workspaces/:workspace_id/name": {
+	"PATCH /api/workspaces/:workspace_id": {
 		"description": "accepts workspace name and renames an existing workspace",
 		"exampleRequest": {
-			"workspaceName": "Agile Aces"
+			"name": "Agile Aces"
 		},
 		"exampleResponse": {
 			"workspace": {
@@ -72,7 +71,7 @@
 			}
 		}
 	},
-	"PATCH /api/workspaces/:workspace_id/users": {
+	"POST /api/workspaces/:workspace_id/users": {
 		"description": "adds logged in user ID to users array of an existing workspace",
 		"exampleResponse": {
 			"workspace": {
@@ -86,7 +85,7 @@
 		"description": "removes user ID from users array of an existing workspace and deletes workspace from the database if users array becomes empty"
 	},
 	"POST /api/boards": {
-		"description": "accepts board name and workspace ID then adds the board to the database and updates the boards array of the workspace",
+		"description": "accepts board name and workspace ID then adds the board to the database",
 		"exampleRequest": {
 			"boardName": "House of Games API",
 			"workspaceId": "64f71c09bd22c8de14b39184"
@@ -94,6 +93,7 @@
 		"exampleResponse": {
 			"_id": "655e1029e5555308e1288025",
 			"name": "House of Games API",
+			"workspace": "64f71c09bd22c8de14b39184",
 			"labels": [],
 			"lists": []
 		}
