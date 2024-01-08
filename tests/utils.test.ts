@@ -533,7 +533,7 @@ describe('addUserToWorkspace()', () => {
 		expect(Array.isArray(output)).toBe(false)
 		expect(output).not.toBe(workspace)
 	})
-	test('adds user ID users array', () => {
+	test('adds user ID to users array', () => {
 		interface WorkspaceI {
 			_id: ObjectId
 			name: string
