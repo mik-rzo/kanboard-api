@@ -4,7 +4,8 @@ import {
 	convertWorkspaceObjectIdsToStrings,
 	convertBoardObjectIdsToStrings,
 	addUserToWorkspace,
-	deleteUserFromWorkspace
+	deleteUserFromWorkspace,
+	addListToBoard
 } from '../src/utils'
 import { ObjectId } from 'mongodb'
 
@@ -617,5 +618,390 @@ describe('deleteUserFromWorkspace()', () => {
 		}
 		deleteUserFromWorkspace(input, new ObjectId('65325f0b1423421bfa7277b4'))
 		expect(input).toEqual(control)
+	})
+})
+
+describe('addListToBoard()', () => {
+	test('returns a new object', () => {
+		interface BoardI {
+			_id: ObjectId
+			name: string
+			workspace: ObjectId
+			labels: {
+				_id: ObjectId
+				colour: string
+				title: string
+			}[]
+			lists: {
+				_id: ObjectId
+				header: string
+				cards: {
+					_id: ObjectId
+					title: string
+					description: string
+					assign: ObjectId[]
+					labels: ObjectId[]
+				}[]
+			}[]
+		}
+		const board: BoardI = {
+			_id: new ObjectId(),
+			name: 'House of Games API',
+			workspace: new ObjectId(),
+			labels: [
+				{ _id: new ObjectId(), colour: 'red', title: 'Core Task' },
+				{ _id: new ObjectId(), colour: 'blue', title: 'Further Task' },
+				{ _id: new ObjectId(), colour: 'purple', title: 'New Endpoint' },
+				{ _id: new ObjectId(), colour: 'yellow', title: 'Refactor' }
+			],
+			lists: [
+				{
+					_id: new ObjectId(),
+					header: 'Tasks',
+					cards: [
+						{
+							_id: new ObjectId(),
+							title: 'POST /api/users',
+							description: 'Lorem ipsum',
+							assign: [],
+							labels: [new ObjectId(), new ObjectId()]
+						},
+						{
+							_id: new ObjectId(),
+							title: 'GET /api/reviews (queries)',
+							description: 'Lorem ipsum',
+							assign: [],
+							labels: [new ObjectId(), new ObjectId()]
+						}
+					]
+				},
+				{
+					_id: new ObjectId(),
+					header: 'In progress',
+					cards: [
+						{
+							_id: new ObjectId(),
+							title: 'GET /api/reviews/:review_id',
+							description: 'Lorem ipsum',
+							assign: [new ObjectId()],
+							labels: [new ObjectId(), new ObjectId()]
+						},
+						{
+							_id: new ObjectId(),
+							title: 'POST /api/reviews',
+							description: 'Lorem ipsum',
+							assign: [new ObjectId(), new ObjectId()],
+							labels: [new ObjectId(), new ObjectId()]
+						}
+					]
+				},
+				{
+					_id: new ObjectId(),
+					header: 'Code Review',
+					cards: [
+						{
+							_id: new ObjectId(),
+							title: 'GET /api/reviews',
+							description: 'Lorem ipsum',
+							assign: [new ObjectId()],
+							labels: [new ObjectId(), new ObjectId()]
+						}
+					]
+				},
+				{
+					_id: new ObjectId(),
+					header: 'Done',
+					cards: [
+						{
+							_id: new ObjectId(),
+							title: 'GET /api/categories',
+							description: 'Lorem ipsum',
+							assign: [new ObjectId()],
+							labels: [new ObjectId(), new ObjectId()]
+						}
+					]
+				}
+			]
+		}
+		const list: BoardI['lists'][0] = {
+			_id: new ObjectId('659c02c13a1131d7b65f72e1'),
+			header: 'Backlog',
+			cards: []
+		}
+		const output = addListToBoard(board, list)
+		expect(output).toBeTypeOf('object')
+		expect(Array.isArray(output)).toBe(false)
+		expect(output).not.toBe(board)
+	})
+	test('adds list to lists array', () => {
+		interface BoardI {
+			_id: ObjectId
+			name: string
+			workspace: ObjectId
+			labels: {
+				_id: ObjectId
+				colour: string
+				title: string
+			}[]
+			lists: {
+				_id: ObjectId
+				header: string
+				cards: {
+					_id: ObjectId
+					title: string
+					description: string
+					assign: ObjectId[]
+					labels: ObjectId[]
+				}[]
+			}[]
+		}
+		const board: BoardI = {
+			_id: new ObjectId(),
+			name: 'House of Games API',
+			workspace: new ObjectId(),
+			labels: [
+				{ _id: new ObjectId(), colour: 'red', title: 'Core Task' },
+				{ _id: new ObjectId(), colour: 'blue', title: 'Further Task' },
+				{ _id: new ObjectId(), colour: 'purple', title: 'New Endpoint' },
+				{ _id: new ObjectId(), colour: 'yellow', title: 'Refactor' }
+			],
+			lists: [
+				{
+					_id: new ObjectId(),
+					header: 'Tasks',
+					cards: [
+						{
+							_id: new ObjectId(),
+							title: 'POST /api/users',
+							description: 'Lorem ipsum',
+							assign: [],
+							labels: [new ObjectId(), new ObjectId()]
+						},
+						{
+							_id: new ObjectId(),
+							title: 'GET /api/reviews (queries)',
+							description: 'Lorem ipsum',
+							assign: [],
+							labels: [new ObjectId(), new ObjectId()]
+						}
+					]
+				},
+				{
+					_id: new ObjectId(),
+					header: 'In progress',
+					cards: [
+						{
+							_id: new ObjectId(),
+							title: 'GET /api/reviews/:review_id',
+							description: 'Lorem ipsum',
+							assign: [new ObjectId()],
+							labels: [new ObjectId(), new ObjectId()]
+						},
+						{
+							_id: new ObjectId(),
+							title: 'POST /api/reviews',
+							description: 'Lorem ipsum',
+							assign: [new ObjectId(), new ObjectId()],
+							labels: [new ObjectId(), new ObjectId()]
+						}
+					]
+				},
+				{
+					_id: new ObjectId(),
+					header: 'Code Review',
+					cards: [
+						{
+							_id: new ObjectId(),
+							title: 'GET /api/reviews',
+							description: 'Lorem ipsum',
+							assign: [new ObjectId()],
+							labels: [new ObjectId(), new ObjectId()]
+						}
+					]
+				},
+				{
+					_id: new ObjectId(),
+					header: 'Done',
+					cards: [
+						{
+							_id: new ObjectId(),
+							title: 'GET /api/categories',
+							description: 'Lorem ipsum',
+							assign: [new ObjectId()],
+							labels: [new ObjectId(), new ObjectId()]
+						}
+					]
+				}
+			]
+		}
+		const list: BoardI['lists'][0] = {
+			_id: new ObjectId('659c02c13a1131d7b65f72e1'),
+			header: 'Backlog',
+			cards: []
+		}
+		const output = addListToBoard(board, list)
+		expect(output.lists).toContainEqual(list)
+	})
+	test('does not mutate the input', () => {
+		const board = {
+			_id: new ObjectId('659c02c13a1131d7b65f72a1'),
+			name: 'House of Games API',
+			workspace: new ObjectId('659c02c13a1131d7b65f72b1'),
+			labels: [
+				{ _id: new ObjectId('659c02c13a1131d7b65f7201'), colour: 'red', title: 'Core Task' },
+				{ _id: new ObjectId('659c02c13a1131d7b65f7202'), colour: 'blue', title: 'Further Task' },
+				{ _id: new ObjectId('659c02c13a1131d7b65f7203'), colour: 'purple', title: 'New Endpoint' },
+				{ _id: new ObjectId('659c02c13a1131d7b65f7204'), colour: 'yellow', title: 'Refactor' }
+			],
+			lists: [
+				{
+					_id: new ObjectId('659c02c13a1131d7b65f72c1'),
+					header: 'Tasks',
+					cards: [
+						{
+							_id: new ObjectId('659c02c13a1131d7b65f72d1'),
+							title: 'POST /api/users',
+							description: 'Lorem ipsum',
+							assign: [],
+							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
+						},
+						{
+							_id: new ObjectId('659c02c13a1131d7b65f72d2'),
+							title: 'GET /api/reviews (queries)',
+							description: 'Lorem ipsum',
+							assign: [],
+							labels: [new ObjectId('659c02c13a1131d7b65f7202'), new ObjectId('659c02c13a1131d7b65f7204')]
+						}
+					]
+				},
+				{
+					_id: new ObjectId('659c02c13a1131d7b65f72c2'),
+					header: 'In progress',
+					cards: [
+						{
+							_id: new ObjectId('659c02c13a1131d7b65f72d3'),
+							title: 'GET /api/reviews/:review_id',
+							description: 'Lorem ipsum',
+							assign: [new ObjectId('659c02c13a1131d7b65f72f1')],
+							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
+						},
+						{
+							_id: new ObjectId('659c02c13a1131d7b65f72d4'),
+							title: 'POST /api/reviews',
+							description: 'Lorem ipsum',
+							assign: [new ObjectId('659c02c13a1131d7b65f72f2'), new ObjectId('659c02c13a1131d7b65f72f3')],
+							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
+						}
+					]
+				},
+				{
+					_id: new ObjectId('659c02c13a1131d7b65f72c3'),
+					header: 'Code Review',
+					cards: [
+						{
+							_id: new ObjectId('659c02c13a1131d7b65f72d5'),
+							title: 'GET /api/reviews',
+							description: 'Lorem ipsum',
+							assign: [new ObjectId('659c02c13a1131d7b65f72f4')],
+							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
+						}
+					]
+				},
+				{
+					_id: new ObjectId('659c02c13a1131d7b65f72c4'),
+					header: 'Done',
+					cards: [
+						{
+							_id: new ObjectId('659c02c13a1131d7b65f72d6'),
+							title: 'GET /api/categories',
+							description: 'Lorem ipsum',
+							assign: [new ObjectId('659c02c13a1131d7b65f72f1')],
+							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
+						}
+					]
+				}
+			]
+		}
+		const control = {
+			_id: new ObjectId('659c02c13a1131d7b65f72a1'),
+			name: 'House of Games API',
+			workspace: new ObjectId('659c02c13a1131d7b65f72b1'),
+			labels: [
+				{ _id: new ObjectId('659c02c13a1131d7b65f7201'), colour: 'red', title: 'Core Task' },
+				{ _id: new ObjectId('659c02c13a1131d7b65f7202'), colour: 'blue', title: 'Further Task' },
+				{ _id: new ObjectId('659c02c13a1131d7b65f7203'), colour: 'purple', title: 'New Endpoint' },
+				{ _id: new ObjectId('659c02c13a1131d7b65f7204'), colour: 'yellow', title: 'Refactor' }
+			],
+			lists: [
+				{
+					_id: new ObjectId('659c02c13a1131d7b65f72c1'),
+					header: 'Tasks',
+					cards: [
+						{
+							_id: new ObjectId('659c02c13a1131d7b65f72d1'),
+							title: 'POST /api/users',
+							description: 'Lorem ipsum',
+							assign: [],
+							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
+						},
+						{
+							_id: new ObjectId('659c02c13a1131d7b65f72d2'),
+							title: 'GET /api/reviews (queries)',
+							description: 'Lorem ipsum',
+							assign: [],
+							labels: [new ObjectId('659c02c13a1131d7b65f7202'), new ObjectId('659c02c13a1131d7b65f7204')]
+						}
+					]
+				},
+				{
+					_id: new ObjectId('659c02c13a1131d7b65f72c2'),
+					header: 'In progress',
+					cards: [
+						{
+							_id: new ObjectId('659c02c13a1131d7b65f72d3'),
+							title: 'GET /api/reviews/:review_id',
+							description: 'Lorem ipsum',
+							assign: [new ObjectId('659c02c13a1131d7b65f72f1')],
+							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
+						},
+						{
+							_id: new ObjectId('659c02c13a1131d7b65f72d4'),
+							title: 'POST /api/reviews',
+							description: 'Lorem ipsum',
+							assign: [new ObjectId('659c02c13a1131d7b65f72f2'), new ObjectId('659c02c13a1131d7b65f72f3')],
+							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
+						}
+					]
+				},
+				{
+					_id: new ObjectId('659c02c13a1131d7b65f72c3'),
+					header: 'Code Review',
+					cards: [
+						{
+							_id: new ObjectId('659c02c13a1131d7b65f72d5'),
+							title: 'GET /api/reviews',
+							description: 'Lorem ipsum',
+							assign: [new ObjectId('659c02c13a1131d7b65f72f4')],
+							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
+						}
+					]
+				},
+				{
+					_id: new ObjectId('659c02c13a1131d7b65f72c4'),
+					header: 'Done',
+					cards: [
+						{
+							_id: new ObjectId('659c02c13a1131d7b65f72d6'),
+							title: 'GET /api/categories',
+							description: 'Lorem ipsum',
+							assign: [new ObjectId('659c02c13a1131d7b65f72f1')],
+							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
+						}
+					]
+				}
+			]
+		}
+		addListToBoard(board, { _id: new ObjectId('659c02c13a1131d7b65f72e1'), header: 'Backlog', cards: [] })
+		expect(board).toEqual(control)
 	})
 })
