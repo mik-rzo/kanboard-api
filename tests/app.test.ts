@@ -1011,6 +1011,9 @@ describe('/api/boards', () => {
 		boardName: string
 		workspaceId: string
 	}
+	interface PostListRequestBody {
+		listHeader: string
+	}
 	describe('POST request', () => {
 		interface PartialPostBoardRequestBody extends Partial<PostBoardRequestBody> {}
 		test('status 201 - accepts object with board name and workspace ID', () => {
@@ -1027,9 +1030,9 @@ describe('/api/boards', () => {
 				.send(login)
 				.then((response) => {
 					const cookie = response.headers['set-cookie']
-					return Promise.all([request(app).post('/api/boards').send(board).set('Cookie', cookie).expect(201), cookie])
+					return request(app).post('/api/boards').send(board).set('Cookie', cookie).expect(201)
 				})
-				.then(([response, cookie]) => {
+				.then((response) => {
 					const { board } = response.body
 					expect(board).toHaveProperty('_id')
 					expect(board.name).toBe('House of Games API')
@@ -1146,6 +1149,166 @@ describe('/api/boards', () => {
 					const { message } = response.body
 					expect(message).toBe('Workspace matching ID not found.')
 				})
+		})
+	})
+	describe('/:board_id/lists', () => {
+		describe('POST request', () => {
+			test('status 201 - accepts list header and adds list data to lists array of board matching board ID', () => {
+				const login: LoginRequestBody = {
+					email: 'jake.weston@example.com',
+					password: 'fddnQzxuqerp'
+				}
+				const board: PostBoardRequestBody = {
+					boardName: 'House of Games API',
+					workspaceId: '64f71c09bd22c8de14b39184'
+				}
+				const list: PostListRequestBody = {
+					listHeader: 'Core Tasks'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postBoard = request(app).post('/api/boards').set('Cookie', cookie).send(board)
+						return Promise.all([postBoard, cookie])
+					})
+					.then(([response, cookie]) => {
+						const boardId = response.body.board._id
+						return request(app).post(`/api/boards/${boardId}/lists`).set('Cookie', cookie).send(list).expect(201)
+					})
+					.then((response) => {
+						const { board } = response.body
+						expect(board.lists).toHaveLength(1)
+						const list = board.lists[0]
+						expect(list).toHaveProperty('_id')
+						expect(list.header).toBe('Core Tasks')
+						expect(Array.isArray(list.cards)).toBe(true)
+						expect(list.cards.length).toBe(0)
+					})
+			})
+			test('status 401 - user is not authenticated', () => {
+				const login: LoginRequestBody = {
+					email: 'jake.weston@example.com',
+					password: 'fddnQzxuqerp'
+				}
+				const board: PostBoardRequestBody = {
+					boardName: 'House of Games API',
+					workspaceId: '64f71c09bd22c8de14b39184'
+				}
+				const list: PostListRequestBody = {
+					listHeader: 'Core Tasks'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postBoard = request(app).post('/api/boards').set('Cookie', cookie).send(board)
+						return Promise.all([postBoard, cookie])
+					})
+					.then(([response, cookie]) => {
+						const boardId = response.body.board._id
+						const logout = request(app).delete('/api/sessions').set('Cookie', cookie)
+						return Promise.all([logout, boardId, cookie])
+					})
+					.then(([response, boardId, cookie]) => {
+						return request(app).post(`/api/boards/${boardId}/lists`).set('Cookie', cookie).send(list).expect(401)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('Not logged in.')
+					})
+			})
+			test('status 400 - missing list title in request body', () => {
+				const login: LoginRequestBody = {
+					email: 'jake.weston@example.com',
+					password: 'fddnQzxuqerp'
+				}
+				const board: PostBoardRequestBody = {
+					boardName: 'House of Games API',
+					workspaceId: '64f71c09bd22c8de14b39184'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postBoard = request(app).post('/api/boards').set('Cookie', cookie).send(board)
+						return Promise.all([postBoard, cookie])
+					})
+					.then(([response, cookie]) => {
+						const boardId = response.body.board._id
+						return request(app).post(`/api/boards/${boardId}/lists`).set('Cookie', cookie).send({}).expect(400)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('Missing required information in request body.')
+					})
+			})
+			test('status 404 - could not find board matching ID', () => {
+				const login: LoginRequestBody = {
+					email: 'jake.weston@example.com',
+					password: 'fddnQzxuqerp'
+				}
+				const boardId = new ObjectId().toString()
+				const list: PostListRequestBody = {
+					listHeader: 'Core Tasks'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						return request(app).post(`/api/boards/${boardId}/lists`).set('Cookie', cookie).send(list).expect(404)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('Board matching ID not found.')
+					})
+			})
+			test('status 403 - user is not authorized to edit board', () => {
+				const loginJake: LoginRequestBody = {
+					email: 'jake.weston@example.com',
+					password: 'fddnQzxuqerp'
+				}
+				const loginCasper: LoginRequestBody = {
+					email: 'casper.nystrom@example.com',
+					password: 'imfeym7q9nwj'
+				}
+				const board: PostBoardRequestBody = {
+					boardName: 'House of Games API',
+					workspaceId: '64f71c09bd22c8de14b39184'
+				}
+				const list: PostListRequestBody = {
+					listHeader: 'Core Tasks'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(loginJake)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postBoard = request(app).post('/api/boards').set('Cookie', cookie).send(board)
+						return Promise.all([postBoard, cookie])
+					})
+					.then(([response, cookie]) => {
+						const boardId = response.body.board._id
+						const logout = request(app).delete('/api/sessions').set('Cookie', cookie)
+						return Promise.all([logout, boardId, cookie])
+					})
+					.then(([response, boardId, cookie]) => {
+						const login = request(app).post('/api/sessions').send(loginCasper)
+						return Promise.all([login, boardId])
+					})
+					.then(([response, boardId]) => {
+						const cookie = response.headers['set-cookie']
+						return request(app).post(`/api/boards/${boardId}/lists`).set('Cookie', cookie).send(list).expect(403)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('User is not part of workspace.')
+					})
+			})
 		})
 	})
 })
