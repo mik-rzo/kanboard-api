@@ -91,11 +91,34 @@
 			"workspaceId": "64f71c09bd22c8de14b39184"
 		},
 		"exampleResponse": {
-			"_id": "655e1029e5555308e1288025",
-			"name": "House of Games API",
-			"workspace": "64f71c09bd22c8de14b39184",
-			"labels": [],
-			"lists": []
+			"board": {
+				"_id": "655e1029e5555308e1288025",
+				"name": "House of Games API",
+				"workspace": "64f71c09bd22c8de14b39184",
+				"labels": [],
+				"lists": []
+			}
+		}
+	},
+	"POST /api/boards/:board_id/lists": {
+		"description": "accepts list header and adds new list to lists array of an existing board",
+		"exampleRequest": {
+			"listHeader": "Core Tasks"
+		},
+		"exampleResponse": {
+			"board": {
+				"_id": "659ee7f32f0dfe902fee3a4a",
+				"name": "House of Games API",
+				"workspace": "64f71c09bd22c8de14b39184",
+				"labels": [],
+				"lists": [
+					{
+						"_id": "659ee7f32f0dfe902fee3a4b",
+						"header": "Core Tasks",
+						"cards": []
+					}
+				]
+			}
 		}
 	}
 }
