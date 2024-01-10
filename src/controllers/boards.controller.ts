@@ -42,8 +42,7 @@ export function postBoardList(request, response, next) {
 			return addBoardList(listHeader, board_id)
 		})
 		.then((board) => {
-			const list = board.lists.at(-1)
-			response.status(201).send({ list: list })
+			response.status(201).send({ board: board })
 		})
 		.catch((error) => {
 			next(error)

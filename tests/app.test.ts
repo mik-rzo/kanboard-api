@@ -1178,7 +1178,9 @@ describe('/api/boards', () => {
 						return request(app).post(`/api/boards/${boardId}/lists`).set('Cookie', cookie).send(list).expect(201)
 					})
 					.then((response) => {
-						const { list } = response.body
+						const { board } = response.body
+						expect(board.lists).toHaveLength(1)
+						const list = board.lists[0]
 						expect(list).toHaveProperty('_id')
 						expect(list.header).toBe('Core Tasks')
 						expect(Array.isArray(list.cards)).toBe(true)
