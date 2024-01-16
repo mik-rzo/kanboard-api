@@ -87,13 +87,13 @@
 	"POST /api/boards": {
 		"description": "accepts board name and workspace ID then adds the board to the database",
 		"exampleRequest": {
-			"boardName": "House of Games API",
+			"boardName": "House of Games",
 			"workspaceId": "64f71c09bd22c8de14b39184"
 		},
 		"exampleResponse": {
 			"board": {
 				"_id": "655e1029e5555308e1288025",
-				"name": "House of Games API",
+				"name": "House of Games",
 				"workspace": "64f71c09bd22c8de14b39184",
 				"labels": [],
 				"lists": []
@@ -108,7 +108,7 @@
 		"exampleResponse": {
 			"board": {
 				"_id": "659ee7f32f0dfe902fee3a4a",
-				"name": "House of Games API",
+				"name": "House of Games",
 				"workspace": "64f71c09bd22c8de14b39184",
 				"labels": [],
 				"lists": [
