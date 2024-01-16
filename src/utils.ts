@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongodb'
+
 export function convertUserObjectIdsToStrings(user) {
 	return {
 		_id: user._id.toString(),
@@ -46,14 +48,15 @@ export function convertBoardObjectIdsToStrings(board) {
 	}
 }
 
-export function addUserToWorkspace(workspace, userId) {
-	return { ...workspace, users: [...workspace.users, userId] }
+export function addElementToArray(object, element, key) {
+	return { ...object, [key]: [...object[key], element] }
 }
 
-export function deleteUserFromWorkspace(workspace, userId) {
-	return { ...workspace, users: workspace.users.filter((userIdElement) => !userIdElement.equals(userId)) }
-}
-
-export function addListToBoard(board, list) {
-	return { ...board, lists: [...board.lists, list] }
+export function removeElementFromArray(object, element, key) {
+	return {
+		...object,
+		[key]: object[key].filter((value) =>
+			value instanceof ObjectId ? !value.equals(element) : !value._id.equals(element)
+		)
+	}
 }

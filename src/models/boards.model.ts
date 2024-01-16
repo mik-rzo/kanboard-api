@@ -1,6 +1,6 @@
 import pool from '../db/connection.js'
 import { ObjectId } from 'mongodb'
-import { convertBoardObjectIdsToStrings, addListToBoard } from '../utils.js'
+import { convertBoardObjectIdsToStrings, addElementToArray } from '../utils.js'
 
 export function insertBoard(boardName, workspaceId) {
 	workspaceId = new ObjectId(workspaceId)
@@ -40,7 +40,7 @@ export function addBoardList(listHeader, boardId) {
 			return Promise.all([db.collection('boards').findOne({ _id: boardId }), db])
 		})
 		.then(([result, db]) => {
-			const updatedBoard = addListToBoard(result, list)
+			const updatedBoard = addElementToArray(result, list, 'lists')
 			return db.collection('boards').updateOne({ _id: boardId }, { $set: { lists: updatedBoard.lists } })
 		})
 		.then(() => {

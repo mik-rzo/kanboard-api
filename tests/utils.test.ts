@@ -3,9 +3,8 @@ import {
 	convertUserObjectIdsToStrings,
 	convertWorkspaceObjectIdsToStrings,
 	convertBoardObjectIdsToStrings,
-	addUserToWorkspace,
-	deleteUserFromWorkspace,
-	addListToBoard
+	addElementToArray,
+	removeElementFromArray
 } from '../src/utils'
 import { ObjectId } from 'mongodb'
 
@@ -515,114 +514,38 @@ describe('convertBoardObjectIdsToStrings()', () => {
 	})
 })
 
-describe('addUserToWorkspace()', () => {
+describe('addElementToArray()', () => {
 	test('returns a new object', () => {
 		interface WorkspaceI {
 			_id: ObjectId
 			name: string
 			users: ObjectId[]
-			boards: ObjectId[]
 		}
 		const workspace: WorkspaceI = {
 			_id: new ObjectId(),
 			name: 'Buggy Bears',
-			users: [new ObjectId()],
-			boards: [new ObjectId()]
+			users: [new ObjectId()]
 		}
-		const output = addUserToWorkspace(workspace, new ObjectId())
+		const output = addElementToArray(workspace, new ObjectId(), 'users')
 		expect(output).toBeTypeOf('object')
 		expect(Array.isArray(output)).toBe(false)
 		expect(output).not.toBe(workspace)
 	})
-	test('adds user ID to users array', () => {
+	test('adds objectID to users array', () => {
 		interface WorkspaceI {
 			_id: ObjectId
 			name: string
 			users: ObjectId[]
-			boards: ObjectId[]
 		}
 		const workspace: WorkspaceI = {
 			_id: new ObjectId(),
 			name: 'Buggy Bears',
-			users: [new ObjectId('65325f0b1423421bfa7277a3')],
-			boards: [new ObjectId()]
+			users: [new ObjectId('65325f0b1423421bfa7277a3')]
 		}
-		const output = addUserToWorkspace(workspace, new ObjectId('65325f0b1423421bfa7277a4'))
+		const output = addElementToArray(workspace, new ObjectId('65325f0b1423421bfa7277a4'), 'users')
 		expect(output.users.some((userId) => userId.equals(new ObjectId('65325f0b1423421bfa7277a4')))).toBe(true)
 	})
-	test('does not mutate the input', () => {
-		const input = {
-			_id: new ObjectId('65325f0b1423421bfa7277a2'),
-			name: 'Buggy Bears',
-			users: [new ObjectId('65325f0b1423421bfa7277a3')],
-			boards: [new ObjectId('65325f0b1423421bfa7277a5')]
-		}
-		const control = {
-			_id: new ObjectId('65325f0b1423421bfa7277a2'),
-			name: 'Buggy Bears',
-			users: [new ObjectId('65325f0b1423421bfa7277a3')],
-			boards: [new ObjectId('65325f0b1423421bfa7277a5')]
-		}
-		addUserToWorkspace(input, new ObjectId('65325f0b1423421bfa7277a4'))
-		expect(input).toEqual(control)
-	})
-})
-
-describe('deleteUserFromWorkspace()', () => {
-	test('returns a new object', () => {
-		interface WorkspaceI {
-			_id: ObjectId
-			name: string
-			users: ObjectId[]
-			boards: ObjectId[]
-		}
-		const workspace: WorkspaceI = {
-			_id: new ObjectId(),
-			name: 'Buggy Bears',
-			users: [new ObjectId()],
-			boards: [new ObjectId()]
-		}
-		const output = deleteUserFromWorkspace(workspace, new ObjectId())
-		expect(output).toBeTypeOf('object')
-		expect(Array.isArray(output)).toBe(false)
-		expect(output).not.toBe(workspace)
-	})
-	test('removes user ID from users array', () => {
-		interface WorkspaceI {
-			_id: ObjectId
-			name: string
-			users: ObjectId[]
-			boards: ObjectId[]
-		}
-		const workspace: WorkspaceI = {
-			_id: new ObjectId(),
-			name: 'Buggy Bears',
-			users: [new ObjectId('65325f0b1423421bfa7277a3'), new ObjectId('65325f0b1423421bfa7277b4')],
-			boards: [new ObjectId()]
-		}
-		const output = deleteUserFromWorkspace(workspace, new ObjectId('65325f0b1423421bfa7277b4'))
-		expect(output.users.some((userId) => userId.equals(new ObjectId('65325f0b1423421bfa7277b4')))).toBe(false)
-	})
-	test('does not mutate the input', () => {
-		const input = {
-			_id: new ObjectId('65325f0b1423421bfa7277b1'),
-			name: 'Buggy Bears',
-			users: [new ObjectId('65325f0b1423421bfa7277a3'), new ObjectId('65325f0b1423421bfa7277b4')],
-			boards: [new ObjectId('65325f0b1423421bfa7277b5')]
-		}
-		const control = {
-			_id: new ObjectId('65325f0b1423421bfa7277b1'),
-			name: 'Buggy Bears',
-			users: [new ObjectId('65325f0b1423421bfa7277a3'), new ObjectId('65325f0b1423421bfa7277b4')],
-			boards: [new ObjectId('65325f0b1423421bfa7277b5')]
-		}
-		deleteUserFromWorkspace(input, new ObjectId('65325f0b1423421bfa7277b4'))
-		expect(input).toEqual(control)
-	})
-})
-
-describe('addListToBoard()', () => {
-	test('returns a new object', () => {
+	test('adds object to lists array', () => {
 		interface BoardI {
 			_id: ObjectId
 			name: string
@@ -728,280 +651,69 @@ describe('addListToBoard()', () => {
 			header: 'Backlog',
 			cards: []
 		}
-		const output = addListToBoard(board, list)
-		expect(output).toBeTypeOf('object')
-		expect(Array.isArray(output)).toBe(false)
-		expect(output).not.toBe(board)
-	})
-	test('adds list to lists array', () => {
-		interface BoardI {
-			_id: ObjectId
-			name: string
-			workspace: ObjectId
-			labels: {
-				_id: ObjectId
-				colour: string
-				title: string
-			}[]
-			lists: {
-				_id: ObjectId
-				header: string
-				cards: {
-					_id: ObjectId
-					title: string
-					description: string
-					assign: ObjectId[]
-					labels: ObjectId[]
-				}[]
-			}[]
-		}
-		const board: BoardI = {
-			_id: new ObjectId(),
-			name: 'House of Games API',
-			workspace: new ObjectId(),
-			labels: [
-				{ _id: new ObjectId(), colour: 'red', title: 'Core Task' },
-				{ _id: new ObjectId(), colour: 'blue', title: 'Further Task' },
-				{ _id: new ObjectId(), colour: 'purple', title: 'New Endpoint' },
-				{ _id: new ObjectId(), colour: 'yellow', title: 'Refactor' }
-			],
-			lists: [
-				{
-					_id: new ObjectId(),
-					header: 'Tasks',
-					cards: [
-						{
-							_id: new ObjectId(),
-							title: 'POST /api/users',
-							description: 'Lorem ipsum',
-							assign: [],
-							labels: [new ObjectId(), new ObjectId()]
-						},
-						{
-							_id: new ObjectId(),
-							title: 'GET /api/reviews (queries)',
-							description: 'Lorem ipsum',
-							assign: [],
-							labels: [new ObjectId(), new ObjectId()]
-						}
-					]
-				},
-				{
-					_id: new ObjectId(),
-					header: 'In progress',
-					cards: [
-						{
-							_id: new ObjectId(),
-							title: 'GET /api/reviews/:review_id',
-							description: 'Lorem ipsum',
-							assign: [new ObjectId()],
-							labels: [new ObjectId(), new ObjectId()]
-						},
-						{
-							_id: new ObjectId(),
-							title: 'POST /api/reviews',
-							description: 'Lorem ipsum',
-							assign: [new ObjectId(), new ObjectId()],
-							labels: [new ObjectId(), new ObjectId()]
-						}
-					]
-				},
-				{
-					_id: new ObjectId(),
-					header: 'Code Review',
-					cards: [
-						{
-							_id: new ObjectId(),
-							title: 'GET /api/reviews',
-							description: 'Lorem ipsum',
-							assign: [new ObjectId()],
-							labels: [new ObjectId(), new ObjectId()]
-						}
-					]
-				},
-				{
-					_id: new ObjectId(),
-					header: 'Done',
-					cards: [
-						{
-							_id: new ObjectId(),
-							title: 'GET /api/categories',
-							description: 'Lorem ipsum',
-							assign: [new ObjectId()],
-							labels: [new ObjectId(), new ObjectId()]
-						}
-					]
-				}
-			]
-		}
-		const list: BoardI['lists'][0] = {
-			_id: new ObjectId('659c02c13a1131d7b65f72e1'),
-			header: 'Backlog',
-			cards: []
-		}
-		const output = addListToBoard(board, list)
+		const output = addElementToArray(board, list, 'lists')
 		expect(output.lists).toContainEqual(list)
 	})
 	test('does not mutate the input', () => {
-		const board = {
-			_id: new ObjectId('659c02c13a1131d7b65f72a1'),
-			name: 'House of Games API',
-			workspace: new ObjectId('659c02c13a1131d7b65f72b1'),
-			labels: [
-				{ _id: new ObjectId('659c02c13a1131d7b65f7201'), colour: 'red', title: 'Core Task' },
-				{ _id: new ObjectId('659c02c13a1131d7b65f7202'), colour: 'blue', title: 'Further Task' },
-				{ _id: new ObjectId('659c02c13a1131d7b65f7203'), colour: 'purple', title: 'New Endpoint' },
-				{ _id: new ObjectId('659c02c13a1131d7b65f7204'), colour: 'yellow', title: 'Refactor' }
-			],
-			lists: [
-				{
-					_id: new ObjectId('659c02c13a1131d7b65f72c1'),
-					header: 'Tasks',
-					cards: [
-						{
-							_id: new ObjectId('659c02c13a1131d7b65f72d1'),
-							title: 'POST /api/users',
-							description: 'Lorem ipsum',
-							assign: [],
-							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
-						},
-						{
-							_id: new ObjectId('659c02c13a1131d7b65f72d2'),
-							title: 'GET /api/reviews (queries)',
-							description: 'Lorem ipsum',
-							assign: [],
-							labels: [new ObjectId('659c02c13a1131d7b65f7202'), new ObjectId('659c02c13a1131d7b65f7204')]
-						}
-					]
-				},
-				{
-					_id: new ObjectId('659c02c13a1131d7b65f72c2'),
-					header: 'In progress',
-					cards: [
-						{
-							_id: new ObjectId('659c02c13a1131d7b65f72d3'),
-							title: 'GET /api/reviews/:review_id',
-							description: 'Lorem ipsum',
-							assign: [new ObjectId('659c02c13a1131d7b65f72f1')],
-							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
-						},
-						{
-							_id: new ObjectId('659c02c13a1131d7b65f72d4'),
-							title: 'POST /api/reviews',
-							description: 'Lorem ipsum',
-							assign: [new ObjectId('659c02c13a1131d7b65f72f2'), new ObjectId('659c02c13a1131d7b65f72f3')],
-							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
-						}
-					]
-				},
-				{
-					_id: new ObjectId('659c02c13a1131d7b65f72c3'),
-					header: 'Code Review',
-					cards: [
-						{
-							_id: new ObjectId('659c02c13a1131d7b65f72d5'),
-							title: 'GET /api/reviews',
-							description: 'Lorem ipsum',
-							assign: [new ObjectId('659c02c13a1131d7b65f72f4')],
-							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
-						}
-					]
-				},
-				{
-					_id: new ObjectId('659c02c13a1131d7b65f72c4'),
-					header: 'Done',
-					cards: [
-						{
-							_id: new ObjectId('659c02c13a1131d7b65f72d6'),
-							title: 'GET /api/categories',
-							description: 'Lorem ipsum',
-							assign: [new ObjectId('659c02c13a1131d7b65f72f1')],
-							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
-						}
-					]
-				}
-			]
+		const input = {
+			_id: new ObjectId('65325f0b1423421bfa7277a2'),
+			name: 'Buggy Bears',
+			users: [new ObjectId('65325f0b1423421bfa7277a3')]
 		}
 		const control = {
-			_id: new ObjectId('659c02c13a1131d7b65f72a1'),
-			name: 'House of Games API',
-			workspace: new ObjectId('659c02c13a1131d7b65f72b1'),
-			labels: [
-				{ _id: new ObjectId('659c02c13a1131d7b65f7201'), colour: 'red', title: 'Core Task' },
-				{ _id: new ObjectId('659c02c13a1131d7b65f7202'), colour: 'blue', title: 'Further Task' },
-				{ _id: new ObjectId('659c02c13a1131d7b65f7203'), colour: 'purple', title: 'New Endpoint' },
-				{ _id: new ObjectId('659c02c13a1131d7b65f7204'), colour: 'yellow', title: 'Refactor' }
-			],
-			lists: [
-				{
-					_id: new ObjectId('659c02c13a1131d7b65f72c1'),
-					header: 'Tasks',
-					cards: [
-						{
-							_id: new ObjectId('659c02c13a1131d7b65f72d1'),
-							title: 'POST /api/users',
-							description: 'Lorem ipsum',
-							assign: [],
-							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
-						},
-						{
-							_id: new ObjectId('659c02c13a1131d7b65f72d2'),
-							title: 'GET /api/reviews (queries)',
-							description: 'Lorem ipsum',
-							assign: [],
-							labels: [new ObjectId('659c02c13a1131d7b65f7202'), new ObjectId('659c02c13a1131d7b65f7204')]
-						}
-					]
-				},
-				{
-					_id: new ObjectId('659c02c13a1131d7b65f72c2'),
-					header: 'In progress',
-					cards: [
-						{
-							_id: new ObjectId('659c02c13a1131d7b65f72d3'),
-							title: 'GET /api/reviews/:review_id',
-							description: 'Lorem ipsum',
-							assign: [new ObjectId('659c02c13a1131d7b65f72f1')],
-							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
-						},
-						{
-							_id: new ObjectId('659c02c13a1131d7b65f72d4'),
-							title: 'POST /api/reviews',
-							description: 'Lorem ipsum',
-							assign: [new ObjectId('659c02c13a1131d7b65f72f2'), new ObjectId('659c02c13a1131d7b65f72f3')],
-							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
-						}
-					]
-				},
-				{
-					_id: new ObjectId('659c02c13a1131d7b65f72c3'),
-					header: 'Code Review',
-					cards: [
-						{
-							_id: new ObjectId('659c02c13a1131d7b65f72d5'),
-							title: 'GET /api/reviews',
-							description: 'Lorem ipsum',
-							assign: [new ObjectId('659c02c13a1131d7b65f72f4')],
-							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
-						}
-					]
-				},
-				{
-					_id: new ObjectId('659c02c13a1131d7b65f72c4'),
-					header: 'Done',
-					cards: [
-						{
-							_id: new ObjectId('659c02c13a1131d7b65f72d6'),
-							title: 'GET /api/categories',
-							description: 'Lorem ipsum',
-							assign: [new ObjectId('659c02c13a1131d7b65f72f1')],
-							labels: [new ObjectId('659c02c13a1131d7b65f7201'), new ObjectId('659c02c13a1131d7b65f7203')]
-						}
-					]
-				}
-			]
+			_id: new ObjectId('65325f0b1423421bfa7277a2'),
+			name: 'Buggy Bears',
+			users: [new ObjectId('65325f0b1423421bfa7277a3')]
 		}
-		addListToBoard(board, { _id: new ObjectId('659c02c13a1131d7b65f72e1'), header: 'Backlog', cards: [] })
-		expect(board).toEqual(control)
+		addElementToArray(input, new ObjectId('65325f0b1423421bfa7277a4'), 'users')
+		expect(input).toEqual(control)
+	})
+})
+
+describe('removeElementFromArray()', () => {
+	test('returns a new object', () => {
+		interface WorkspaceI {
+			_id: ObjectId
+			name: string
+			users: ObjectId[]
+		}
+		const workspace: WorkspaceI = {
+			_id: new ObjectId(),
+			name: 'Buggy Bears',
+			users: [new ObjectId()]
+		}
+		const output = removeElementFromArray(workspace, new ObjectId(), 'users')
+		expect(output).toBeTypeOf('object')
+		expect(Array.isArray(output)).toBe(false)
+		expect(output).not.toBe(workspace)
+	})
+	test('removes correct objectID from users array', () => {
+		interface WorkspaceI {
+			_id: ObjectId
+			name: string
+			users: ObjectId[]
+		}
+		const workspace: WorkspaceI = {
+			_id: new ObjectId(),
+			name: 'Buggy Bears',
+			users: [new ObjectId('65325f0b1423421bfa7277a3'), new ObjectId('65325f0b1423421bfa7277b4')]
+		}
+		const output = removeElementFromArray(workspace, new ObjectId('65325f0b1423421bfa7277b4'), 'users')
+		expect(output.users.some((userId) => userId.equals(new ObjectId('65325f0b1423421bfa7277b4')))).toBe(false)
+	})
+	test.skip('removes object with correct objectID from lists array', () => {})
+	test('does not mutate the input', () => {
+		const input = {
+			_id: new ObjectId('65325f0b1423421bfa7277b1'),
+			name: 'Buggy Bears',
+			users: [new ObjectId('65325f0b1423421bfa7277a3'), new ObjectId('65325f0b1423421bfa7277b4')]
+		}
+		const control = {
+			_id: new ObjectId('65325f0b1423421bfa7277b1'),
+			name: 'Buggy Bears',
+			users: [new ObjectId('65325f0b1423421bfa7277a3'), new ObjectId('65325f0b1423421bfa7277b4')]
+		}
+		removeElementFromArray(input, new ObjectId('65325f0b1423421bfa7277b4'), 'users')
+		expect(input).toEqual(control)
 	})
 })
