@@ -1,3 +1,5 @@
 # Kanboard API
 
-***Work in progress, project is still in early stages.***
+***Work in progress***
+
+Check endpoints.json for implemented endpoints.
