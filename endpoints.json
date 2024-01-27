@@ -101,7 +101,7 @@
 		}
 	},
 	"POST /api/boards/:board_id/lists": {
-		"description": "accepts list header and adds new list to lists array of an existing board",
+		"description": "accepts list header then adds new list to lists array of an existing board",
 		"exampleRequest": {
 			"listHeader": "Core Tasks"
 		},
@@ -118,6 +118,28 @@
 						"cards": []
 					}
 				]
+			}
+		}
+	},
+	"POST /api/boards/:board_id/labels": {
+		"description": "accepts label colour and label title then adds new label to labels array of an existing board",
+		"exampleRequest": {
+			"labelColour": "#f87168",
+			"labelTitle": "High"
+		},
+		"exampleResponse": {
+			"board": {
+				"_id": "65b13a94bb16d1b2878145cf",
+				"name": "House of Games",
+				"workspace": "64f71c09bd22c8de14b39184",
+				"labels": [
+					{
+						"_id": "65b13a94bb16d1b2878145d0",
+						"colour": "#f87168",
+						"title": "High"
+					}
+				],
+				"lists": []
 			}
 		}
 	}
