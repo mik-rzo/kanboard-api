@@ -1,6 +1,6 @@
 import pool from '../db/connection.js'
 import { ObjectId } from 'mongodb'
-import { convertWorkspaceObjectIdsToStrings, addUserToWorkspace, deleteUserFromWorkspace } from '../utils.js'
+import { convertWorkspaceObjectIdsToStrings, addElementToArray, removeElementFromArray } from '../utils.js'
 
 export function insertWorkspace(workspaceName, userId) {
 	userId = new ObjectId(userId)
@@ -70,7 +70,7 @@ export function addWorkspaceUser(workspaceId, userId) {
 		})
 		.then(([workspace, db]) => {
 			const duplicateUser: boolean = workspace.users.some((compareUserId: ObjectId) => compareUserId.equals(userId))
-			const updatedWorkspace = duplicateUser === false ? addUserToWorkspace(workspace, userId) : workspace
+			const updatedWorkspace = duplicateUser === false ? addElementToArray(workspace, userId, 'users') : workspace
 			return db.collection('workspaces').updateOne({ _id: workspaceId }, { $set: { users: updatedWorkspace.users } })
 		})
 		.then(() => {
@@ -90,7 +90,7 @@ export function removeWorkspaceUser(workspaceId, userId) {
 			if (!userInWorkspace) {
 				return Promise.reject({ code: 404, message: 'User matching ID is not part of workspace.' })
 			}
-			const updatedWorkspace = deleteUserFromWorkspace(workspace, userId)
+			const updatedWorkspace = removeElementFromArray(workspace, userId, 'users')
 			return db.collection('workspaces').updateOne({ _id: workspaceId }, { $set: { users: updatedWorkspace.users } })
 		})
 		.then(() => {

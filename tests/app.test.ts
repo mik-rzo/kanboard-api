@@ -1011,9 +1011,6 @@ describe('/api/boards', () => {
 		boardName: string
 		workspaceId: string
 	}
-	interface PostListRequestBody {
-		listHeader: string
-	}
 	describe('POST request', () => {
 		interface PartialPostBoardRequestBody extends Partial<PostBoardRequestBody> {}
 		test('status 201 - accepts object with board name and workspace ID', () => {
@@ -1022,7 +1019,7 @@ describe('/api/boards', () => {
 				password: 'fddnQzxuqerp'
 			}
 			const board: PostBoardRequestBody = {
-				boardName: 'House of Games API',
+				boardName: 'House of Games',
 				workspaceId: '64f71c09bd22c8de14b39184'
 			}
 			return request(app)
@@ -1035,7 +1032,7 @@ describe('/api/boards', () => {
 				.then((response) => {
 					const { board } = response.body
 					expect(board).toHaveProperty('_id')
-					expect(board.name).toBe('House of Games API')
+					expect(board.name).toBe('House of Games')
 					expect(board.workspace).toBe('64f71c09bd22c8de14b39184')
 					expect(Array.isArray(board.labels)).toBe(true)
 					expect(board.labels.length).toBe(0)
@@ -1049,7 +1046,7 @@ describe('/api/boards', () => {
 				password: 'fddnQzxuqerp'
 			}
 			const board: PostBoardRequestBody = {
-				boardName: 'House of Games API',
+				boardName: 'House of Games',
 				workspaceId: '64f71c09bd22c8de14b39184'
 			}
 			return request(app)
@@ -1094,7 +1091,7 @@ describe('/api/boards', () => {
 				password: 'fddnQzxuqerp'
 			}
 			const board: PartialPostBoardRequestBody = {
-				boardName: 'House of Games API'
+				boardName: 'House of Games'
 			}
 			return request(app)
 				.post('/api/sessions')
@@ -1114,7 +1111,7 @@ describe('/api/boards', () => {
 				password: 'fddnQzxuqerp'
 			}
 			const board: PostBoardRequestBody = {
-				boardName: 'House of Games API',
+				boardName: 'House of Games',
 				workspaceId: '64f71c09bd22c8de14b39185'
 			}
 			return request(app)
@@ -1135,7 +1132,7 @@ describe('/api/boards', () => {
 				password: 'fddnQzxuqerp'
 			}
 			const board: PostBoardRequestBody = {
-				boardName: 'House of Games API',
+				boardName: 'House of Games',
 				workspaceId: new ObjectId().toString()
 			}
 			return request(app)
@@ -1152,6 +1149,9 @@ describe('/api/boards', () => {
 		})
 	})
 	describe('/:board_id/lists', () => {
+		interface PostListRequestBody {
+			listHeader: string
+		}
 		describe('POST request', () => {
 			test('status 201 - accepts list header and adds list data to lists array of board matching board ID', () => {
 				const login: LoginRequestBody = {
@@ -1159,7 +1159,7 @@ describe('/api/boards', () => {
 					password: 'fddnQzxuqerp'
 				}
 				const board: PostBoardRequestBody = {
-					boardName: 'House of Games API',
+					boardName: 'House of Games',
 					workspaceId: '64f71c09bd22c8de14b39184'
 				}
 				const list: PostListRequestBody = {
@@ -1193,7 +1193,7 @@ describe('/api/boards', () => {
 					password: 'fddnQzxuqerp'
 				}
 				const board: PostBoardRequestBody = {
-					boardName: 'House of Games API',
+					boardName: 'House of Games',
 					workspaceId: '64f71c09bd22c8de14b39184'
 				}
 				const list: PostListRequestBody = {
@@ -1226,7 +1226,7 @@ describe('/api/boards', () => {
 					password: 'fddnQzxuqerp'
 				}
 				const board: PostBoardRequestBody = {
-					boardName: 'House of Games API',
+					boardName: 'House of Games',
 					workspaceId: '64f71c09bd22c8de14b39184'
 				}
 				return request(app)
@@ -1277,7 +1277,7 @@ describe('/api/boards', () => {
 					password: 'imfeym7q9nwj'
 				}
 				const board: PostBoardRequestBody = {
-					boardName: 'House of Games API',
+					boardName: 'House of Games',
 					workspaceId: '64f71c09bd22c8de14b39184'
 				}
 				const list: PostListRequestBody = {
@@ -1303,6 +1303,216 @@ describe('/api/boards', () => {
 					.then(([response, boardId]) => {
 						const cookie = response.headers['set-cookie']
 						return request(app).post(`/api/boards/${boardId}/lists`).set('Cookie', cookie).send(list).expect(403)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('User is not part of workspace.')
+					})
+			})
+		})
+	})
+	describe(':/board_id/labels', () => {
+		interface PostLabelRequestBody {
+			labelColour:
+				| '#4bce97'
+				| '#f5cd47'
+				| '#fea362'
+				| '#f87168'
+				| '#9f8fef'
+				| '#85b8ff'
+				| '#6cc3e0'
+				| '#b3df72'
+				| '#e774bb'
+				| '#8590a2'
+			labelTitle: string
+		}
+		describe('POST request', () => {
+			interface PartialPostLabelRequestBody extends Partial<PostLabelRequestBody> {}
+			test('status 201 - accepts colour and title then adds label to labels array of an existing board', () => {
+				const login: LoginRequestBody = {
+					email: 'jake.weston@example.com',
+					password: 'fddnQzxuqerp'
+				}
+				const board: PostBoardRequestBody = {
+					boardName: 'House of Games',
+					workspaceId: '64f71c09bd22c8de14b39184'
+				}
+				const label: PostLabelRequestBody = {
+					labelColour: '#f87168',
+					labelTitle: 'High'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postBoard = request(app).post('/api/boards').set('Cookie', cookie).send(board)
+						return Promise.all([postBoard, cookie])
+					})
+					.then(([response, cookie]) => {
+						const boardId = response.body.board._id
+						return request(app).post(`/api/boards/${boardId}/labels`).set('Cookie', cookie).send(label).expect(201)
+					})
+					.then((response) => {
+						const { board } = response.body
+						expect(board.labels).toHaveLength(1)
+						const label = board.labels[0]
+						expect(label).toHaveProperty('_id')
+						expect(label.colour).toBe('#f87168')
+						expect(label.title).toBe('High')
+					})
+			})
+			test('status 401 - user is not authenticated', () => {
+				const login: LoginRequestBody = {
+					email: 'jake.weston@example.com',
+					password: 'fddnQzxuqerp'
+				}
+				const board: PostBoardRequestBody = {
+					boardName: 'House of Games',
+					workspaceId: '64f71c09bd22c8de14b39184'
+				}
+				const label: PostLabelRequestBody = {
+					labelColour: '#f87168',
+					labelTitle: 'High'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postBoard = request(app).post('/api/boards').set('Cookie', cookie).send(board)
+						return Promise.all([postBoard, cookie])
+					})
+					.then(([response, cookie]) => {
+						const boardId = response.body.board._id
+						const logout = request(app).delete('/api/sessions').set('Cookie', cookie)
+						return Promise.all([logout, boardId, cookie])
+					})
+					.then(([response, boardId, cookie]) => {
+						return request(app).post(`/api/boards/${boardId}/labels`).set('Cookie', cookie).send(label).expect(401)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('Not logged in.')
+					})
+			})
+			test('status 400 - missing colour in request body', () => {
+				const login: LoginRequestBody = {
+					email: 'jake.weston@example.com',
+					password: 'fddnQzxuqerp'
+				}
+				const board: PostBoardRequestBody = {
+					boardName: 'House of Games',
+					workspaceId: '64f71c09bd22c8de14b39184'
+				}
+				const label: PartialPostLabelRequestBody = {
+					labelTitle: 'High'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postBoard = request(app).post('/api/boards').set('Cookie', cookie).send(board)
+						return Promise.all([postBoard, cookie])
+					})
+					.then(([response, cookie]) => {
+						const boardId = response.body.board._id
+						return request(app).post(`/api/boards/${boardId}/labels`).set('Cookie', cookie).send(label).expect(400)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('Missing required information in request body.')
+					})
+			})
+			test('status 400 - missing title in request body', () => {
+				const login: LoginRequestBody = {
+					email: 'jake.weston@example.com',
+					password: 'fddnQzxuqerp'
+				}
+				const board: PostBoardRequestBody = {
+					boardName: 'House of Games',
+					workspaceId: '64f71c09bd22c8de14b39184'
+				}
+				const label: PartialPostLabelRequestBody = {
+					labelColour: '#f87168'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postBoard = request(app).post('/api/boards').set('Cookie', cookie).send(board)
+						return Promise.all([postBoard, cookie])
+					})
+					.then(([response, cookie]) => {
+						const boardId = response.body.board._id
+						return request(app).post(`/api/boards/${boardId}/labels`).set('Cookie', cookie).send(label).expect(400)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('Missing required information in request body.')
+					})
+			})
+			test('status 404 - could not find board matching ID', () => {
+				const login: LoginRequestBody = {
+					email: 'jake.weston@example.com',
+					password: 'fddnQzxuqerp'
+				}
+				const boardId = new ObjectId().toString()
+				const label: PostLabelRequestBody = {
+					labelColour: '#f87168',
+					labelTitle: 'High'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(login)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						return request(app).post(`/api/boards/${boardId}/labels`).set('Cookie', cookie).send(label).expect(404)
+					})
+					.then((response) => {
+						const { message } = response.body
+						expect(message).toBe('Board matching ID not found.')
+					})
+			})
+			test('status 403 - user is not authorized to edit board', () => {
+				const loginJake: LoginRequestBody = {
+					email: 'jake.weston@example.com',
+					password: 'fddnQzxuqerp'
+				}
+				const loginCasper: LoginRequestBody = {
+					email: 'casper.nystrom@example.com',
+					password: 'imfeym7q9nwj'
+				}
+				const board: PostBoardRequestBody = {
+					boardName: 'House of Games',
+					workspaceId: '64f71c09bd22c8de14b39184'
+				}
+				const label: PostLabelRequestBody = {
+					labelColour: '#f87168',
+					labelTitle: 'High'
+				}
+				return request(app)
+					.post('/api/sessions')
+					.send(loginJake)
+					.then((response) => {
+						const cookie = response.headers['set-cookie']
+						const postBoard = request(app).post('/api/boards').set('Cookie', cookie).send(board)
+						return Promise.all([postBoard, cookie])
+					})
+					.then(([response, cookie]) => {
+						const boardId = response.body.board._id
+						const logout = request(app).delete('/api/sessions').set('Cookie', cookie)
+						return Promise.all([logout, boardId, cookie])
+					})
+					.then(([response, boardId, cookie]) => {
+						const login = request(app).post('/api/sessions').send(loginCasper)
+						return Promise.all([login, boardId])
+					})
+					.then(([response, boardId]) => {
+						const cookie = response.headers['set-cookie']
+						return request(app).post(`/api/boards/${boardId}/labels`).set('Cookie', cookie).send(label).expect(403)
 					})
 					.then((response) => {
 						const { message } = response.body
